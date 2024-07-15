@@ -1,13 +1,18 @@
-class LeaguesController < ApplicationController
-  before_action :set_league, only: %i[ show edit update destroy ]
+require 'chunky_png'
 
-  # GET /leagues or /leagues.json
+class LeaguesController < ApplicationController
+  before_action :set_league, only: %i[show edit update destroy]
+
+  # GET /leagues
+  # GET /leagues.json
   def index
     @leagues = League.all
   end
 
-  # GET /leagues/1 or /leagues/1.json
+  # GET /leagues/1
+  # GET /leagues/1.json
   def show
+    resize_logo if @league.logo.attached?
   end
 
   # GET /leagues/new
@@ -19,7 +24,8 @@ class LeaguesController < ApplicationController
   def edit
   end
 
-  # POST /leagues or /leagues.json
+  # POST /leagues
+  # POST /leagues.json
   def create
     @league = League.new(league_params)
 
@@ -34,7 +40,8 @@ class LeaguesController < ApplicationController
     end
   end
 
-  # PATCH/PUT /leagues/1 or /leagues/1.json
+  # PATCH/PUT /leagues/1
+  # PATCH/PUT /leagues/1.json
   def update
     respond_to do |format|
       if @league.update(league_params)
@@ -47,9 +54,10 @@ class LeaguesController < ApplicationController
     end
   end
 
-  # DELETE /leagues/1 or /leagues/1.json
+  # DELETE /leagues/1
+  # DELETE /leagues/1.json
   def destroy
-    @league.destroy!
+    @league.destroy
 
     respond_to do |format|
       format.html { redirect_to leagues_url, notice: "League was successfully destroyed." }
@@ -58,13 +66,40 @@ class LeaguesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_league
-      @league = League.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def league_params
-      params.require(:league).permit(:name, :country)
+  def set_league
+    @league = League.find(params[:id])
+  end
+
+  # Resize league logo using ChunkyPNG
+  def resize_logo
+    if @league.logo.attached?
+      logo_path = ActiveStorage::Blob.service.path_for(@league.logo.key)
+
+      # Load image using ChunkyPNG
+      png = ChunkyPNG::Image.from_file(logo_path)
+
+      # Resize image to fit within 200x200 pixels
+      png_resized = png.resize(200, 200)
+
+      # Create a temporary PNG file
+      temp_png = Tempfile.new(['resized_logo', '.png'])
+      temp_png.binmode
+
+      # Save resized image to temporary file
+      png_resized.save(temp_png.path)
+
+      # Attach the resized image as @resized_logo
+      @resized_logo_path = temp_png.path
+
+      # Cleanup temporary file after rendering the view
+      temp_png.close
+      at_exit { temp_png.unlink }
     end
+  end
+
+  # Only allow a list of trusted parameters through.
+  def league_params
+    params.require(:league).permit(:name, :country, :logo)
+  end
 end

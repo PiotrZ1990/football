@@ -1,10 +1,27 @@
+<div id="league-show" class="center-content">
 <p style="color: green"><%= notice %></p>
 
-<%= render @league %>
+<div id="<%= dom_id @league %>">
+  <p>
+    <strong>Name:</strong>
+    <%= @league.name %>
+  </p>
 
-<div>
-  <%= link_to "Edit this league", edit_league_path(@league) %> |
-  <%= link_to "Back to leagues", leagues_path %>
+  <p>
+    <strong>Country:</strong>
+    <%= @league.country %>
+  </p>
 
-  <%= button_to "Destroy this league", @league, method: :delete %>
+  <% if @league.logo.attached? %>
+  <p>
+    <strong>Logo:</strong><br>
+    <%= image_tag @league.logo, style: "max-width: 200px;" %>
+  </p>
+  <% end %>
+
+  <div class="btn-group" role="group">
+    <%= link_to "Edit", edit_league_path(@league), class: "btn btn-primary" %>
+    <%= link_to "Destroy", @league, method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-danger" %>
+    <%= link_to "Back to Leagues", leagues_path, class: "btn btn-secondary" %>
+  </div>
 </div>

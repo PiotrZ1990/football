@@ -1,27 +1,33 @@
-<%= form_with(model: league) do |form| %>
+<%= form_with(model: league, local: true, html: { multipart: true }) do |form| %>
   <% if league.errors.any? %>
-    <div style="color: red">
+    <div id="error_explanation" class="alert alert-danger">
       <h2><%= pluralize(league.errors.count, "error") %> prohibited this league from being saved:</h2>
 
       <ul>
-        <% league.errors.each do |error| %>
-          <li><%= error.full_message %></li>
+        <% league.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :name, style: "display: block" %>
-    <%= form.text_field :name %>
+  <div class="form-group">
+    <%= form.label :name %>
+    <%= form.text_field :name, class: 'form-control', placeholder: 'Enter league name' %>
   </div>
 
-  <div>
-    <%= form.label :country, style: "display: block" %>
-    <%= form.text_field :country %>
+  <div class="form-group">
+    <%= form.label :country %>
+    <%= form.text_field :country, class: 'form-control', placeholder: 'Enter country' %>
   </div>
 
-  <div>
-    <%= form.submit %>
+  <div class="form-group">
+    <%= form.label :logo %>
+    <%= form.file_field :logo, class: 'form-control-file' %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit 'Save', class: 'btn btn-primary' %>
+    <%= link_to 'Back', leagues_path, class: 'btn btn-secondary' %>
   </div>
 <% end %>

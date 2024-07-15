@@ -1,6 +1,6 @@
 class Team < ApplicationRecord
   belongs_to :league
-  validates :name, presence: true
-  validates :location, presence: true
-  validates :year, presence: true
+  has_one_attached :logo
+
+  validates :name, :location, :year, presence: true
 end

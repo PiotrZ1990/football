@@ -1,0 +1,26 @@
+@import "bootstrap";
+
+.form-group {
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#league-show {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+#league-show img {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.center-content {
+  text-align: center;
+  margin-top: 20px;
+}
+

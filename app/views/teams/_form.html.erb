@@ -1,11 +1,10 @@
-<%= form_with(model: team) do |form| %>
+<%= form_with(model: team, local: true, html: { multipart: true }) do |form| %>
   <% if team.errors.any? %>
     <div style="color: red">
       <h2><%= pluralize(team.errors.count, "error") %> prohibited this team from being saved:</h2>
-
       <ul>
-        <% team.errors.each do |error| %>
-          <li><%= error.full_message %></li>
+        <% team.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
         <% end %>
       </ul>
     </div>
@@ -27,8 +26,13 @@
   </div>
 
   <div>
-    <%= form.label :league_id, style: "display: block" %>
-    <%= form.text_field :league_id %>
+    <%= form.label :league_id, "League", style: "display: block" %>
+    <%= form.collection_select :league_id, League.all, :id, :name, prompt: "Select a league" %>
+  </div>
+
+  <div>
+    <%= form.label :logo, "Logo", style: "display: block" %>
+    <%= form.file_field :logo %>
   </div>
 
   <div>

@@ -1,4 +1,4 @@
-<div id="<%= dom_id team %>">
+<div id="<%= dom_id team %>" class="text-center">
   <p>
     <strong>Name:</strong>
     <%= team.name %>
@@ -16,7 +16,13 @@
 
   <p>
     <strong>League:</strong>
-    <%= team.league_id %>
+    <%= team.league.name %>
   </p>
 
+  <% if team.logo.attached? %>
+    <p>
+      <strong>Logo:</strong>
+      <%= image_tag team.logo %>
+    </p>
+  <% end %>
 </div>

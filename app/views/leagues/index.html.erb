@@ -1,14 +1,26 @@
-<p style="color: green"><%= notice %></p>
+<div class="container text-center">
+  <p style="color: green"><%= notice %></p>
 
-<h1>Leagues</h1>
+  <h1>Leagues</h1>
 
-<div id="leagues">
-  <% @leagues.each do |league| %>
-    <%= render league %>
-    <p>
-      <%= link_to "Show this league", league %>
-    </p>
-  <% end %>
+  <%= link_to "New League", new_league_path, class: "btn btn-primary mb-3" %>
+
+  <div id="leagues" class="row d-flex justify-content-center">
+    <% @leagues.each do |league| %>
+      <div id="<%= dom_id league %>" class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-body text-center">
+            <h5 class="card-title"><%= league.name %></h5>
+            <p class="card-text">
+              <strong>Country:</strong> <%= league.country %>
+            </p>
+
+            <div class="btn-group mt-2" role="group">
+              <%= link_to "Show", league, class: "btn btn-primary" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
 </div>
-
-<%= link_to "New league", new_league_path %>

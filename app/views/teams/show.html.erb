@@ -1,10 +1,31 @@
-<p style="color: green"><%= notice %></p>
+<div id="<%= dom_id @team %>" class="text-center">
+  <h1>Team Details</h1>
 
-<%= render @team %>
+  <p>
+    <strong>Name:</strong>
+    <%= @team.name %>
+  </p>
 
-<div>
-  <%= link_to "Edit this team", edit_team_path(@team) %> |
-  <%= link_to "Back to teams", teams_path %>
+  <p>
+    <strong>City:</strong>
+    <%= @team.location %>
+  </p>
 
-  <%= button_to "Destroy this team", @team, method: :delete %>
+  <p>
+    <strong>League:</strong>
+    <%= @team.league.name %>
+  </p>
+
+  <% if @team.logo.attached? %>
+    <p>
+      <strong>Logo:</strong><br>
+      <%= image_tag @team.logo, style: "max-width: 200px;" %>
+    </p>
+  <% end %>
+
+  <div class="btn-group mt-3" role="group">
+    <%= link_to 'Edit', edit_team_path(@team), class: 'btn btn-primary' %>
+    <%= link_to 'Destroy', @team, method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger' %>
+    <%= link_to 'Back to Teams', teams_path, class: 'btn btn-secondary' %>
+  </div>
 </div>

@@ -9,4 +9,10 @@
     <%= league.country %>
   </p>
 
+  <% if league.logo.attached? %>
+    <p>
+      <strong>Logo:</strong>
+      <%= image_tag league.logo %>
+    </p>
+  <% end %>
 </div>
