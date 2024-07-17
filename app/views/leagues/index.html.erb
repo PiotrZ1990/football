@@ -5,22 +5,35 @@
 
   <%= link_to "New League", new_league_path, class: "btn btn-primary mb-3" %>
 
-  <div id="leagues" class="row d-flex justify-content-center">
-    <% @leagues.each do |league| %>
-      <div id="<%= dom_id league %>" class="col-md-4 mb-4">
-        <div class="card h-100">
-          <div class="card-body text-center">
-            <h5 class="card-title"><%= league.name %></h5>
-            <p class="card-text">
-              <strong>Country:</strong> <%= league.country %>
-            </p>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Country</th>
+        <th>Logo</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
 
-            <div class="btn-group mt-2" role="group">
-              <%= link_to "Show", league, class: "btn btn-primary" %>
-            </div>
-          </div>
-        </div>
-      </div>
-    <% end %>
-  </div>
+    <tbody>
+      <% @leagues.each do |league| %>
+        <tr id="<%= dom_id league %>">
+          <td><%= league.name %></td>
+          <td><%= league.country %></td>
+          <td>
+            <% if league.logo.attached? %>
+              <%= image_tag league.logo, style: "max-width: 100px;" %>
+            <% else %>
+              No logo
+            <% end %>
+          </td>
+          <td>
+            <%= link_to 'Show', league, class: 'btn btn-secondary' %>
+            <%= link_to 'Edit', edit_league_path(league), class: 'btn btn-primary' %>
+            <%= link_to 'Destroy', league, method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger' %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 </div>
