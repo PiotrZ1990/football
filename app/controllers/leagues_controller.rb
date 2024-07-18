@@ -5,6 +5,7 @@ class LeaguesController < ApplicationController
 
   # GET /leagues
   def index
+    debugger
     @leagues = League.all
   end
 
