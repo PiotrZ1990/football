@@ -2,7 +2,7 @@ require 'open-uri'
 require 'httparty'
 
 # Definiowanie kluczy API
-API_KEY = '3d153bdce96c6416b79f57b8750b75c4'
+API_KEY = '703b9fe83fca655ad68df6455e60a8ad'
 API_HOST = 'api-football-v1.p.rapidapi.com'
 
 # Metoda do pobierania drużyn dla danej ligi
