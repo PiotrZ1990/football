@@ -1,3 +1,8 @@
+/*
+*= require leaflet
+*/
+
+
 @import "bootstrap";
 
 .form-group {
@@ -24,3 +29,30 @@
   margin-top: 20px;
 }
 
+/* Styl dla SVG z logo */
+.icon-svg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px; /* Szerokość ikony */
+  height: 80px; /* Wysokość ikony */
+  position: relative;
+}
+
+/* Styl dla pinezki */
+.icon-container {
+  position: relative;
+}
+
+.icon-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 20px solid #ff0000; /* Kolor stożka */
+}

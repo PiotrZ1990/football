@@ -4,13 +4,17 @@ class LeaguesController < ApplicationController
   before_action :set_league, only: %i[show edit update destroy]
 
   # GET /leagues
+  # GET /leagues.json
   def index
     @leagues = League.all
+    
   end
 
   # GET /leagues/1
+  # GET /leagues/1.json
   def show
     resize_logo if @league.logo.attached?
+    @teams = @league.teams.includes(:logo)
   end
 
   # GET /leagues/new
@@ -23,6 +27,7 @@ class LeaguesController < ApplicationController
   end
 
   # POST /leagues
+  # POST /leagues.json
   def create
     @league = League.new(league_params)
 
@@ -38,6 +43,7 @@ class LeaguesController < ApplicationController
   end
 
   # PATCH/PUT /leagues/1
+  # PATCH/PUT /leagues/1.json
   def update
     respond_to do |format|
       if @league.update(league_params)
@@ -51,6 +57,7 @@ class LeaguesController < ApplicationController
   end
 
   # DELETE /leagues/1
+  # DELETE /leagues/1.json
   def destroy
     @league.destroy
 
@@ -68,28 +75,29 @@ class LeaguesController < ApplicationController
 
   # Resize league logo using ChunkyPNG
   def resize_logo
-    logo_path = ActiveStorage::Blob.service.path_for(@league.logo.key)
+    if @league.logo.attached?
+      logo_path = ActiveStorage::Blob.service.path_for(@league.logo.key)
 
-    # Load image using ChunkyPNG
-    png = ChunkyPNG::Image.from_file(logo_path)
+      # Load image using ChunkyPNG
+      png = ChunkyPNG::Image.from_file(logo_path)
 
-    # Resize image to fit within 200x200 pixels while maintaining aspect ratio
-    png_resized = png.resample_nearest_neighbor(200, 200)
+      # Resize image to fit within 200x200 pixels
+      png_resized = png.resize(200, 200)
 
-    # Create a temporary PNG file
-    temp_png = Tempfile.new(['resized_logo', '.png'])
-    temp_png.binmode
+      # Create a temporary PNG file
+      temp_png = Tempfile.new(['resized_logo', '.png'])
+      temp_png.binmode
 
-    # Save resized image to temporary file
-    png_resized.save(temp_png.path)
+      # Save resized image to temporary file
+      png_resized.save(temp_png.path)
 
-    # Reattach the resized image
-    @league.logo.purge
-    @league.logo.attach(io: File.open(temp_png.path), filename: 'resized_logo.png', content_type: 'image/png')
+      # Attach the resized image as @resized_logo
+      @resized_logo_path = temp_png.path
 
-    # Cleanup temporary file after attaching the image
-    temp_png.close
-    temp_png.unlink
+      # Cleanup temporary file after rendering the view
+      temp_png.close
+      at_exit { temp_png.unlink }
+    end
   end
 
   # Only allow a list of trusted parameters through.

@@ -1,17 +1,18 @@
 <div id="league-show" class="center-content">
-  <p style="color: green"><%= notice %></p>
+<p style="color: green"><%= notice %></p>
 
-  <div id="<%= dom_id @league %>">
-    <p>
-      <strong>Name:</strong>
-      <%= @league.name %>
-    </p>
+<div id="<%= dom_id @league %>">
+  <p>
+    <strong>Name:</strong>
+    <%= @league.name %>
+  </p>
 
-    <p>
-      <strong>Country:</strong>
-      <%= @league.country %>
-    </p>
+  <p>
+    <strong>Country:</strong>
+    <%= @league.country %>
+  </p>
 
+<<<<<<< Updated upstream
     <% if @league.logo.attached? %>
     <p>
       <strong>Logo:</strong><br>
@@ -23,7 +24,13 @@
       <%= link_to "Edit", edit_league_path(@league), class: "btn btn-primary" %>
       <%= link_to "Destroy", @league, method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-danger" %>
       <%= link_to "Back to Leagues", leagues_path, class: "btn btn-secondary" %>
+      <%= link_to "Show on Map", '#', id: 'show-league-map', class: 'btn btn-info' %>
     </div>
+  </div>
+  <br>
+   <!-- Kontener mapy dla ligi -->
+  <div id="league-map" style="height: 500px; width: 100%; display: none;"
+       data-teams='<%= raw @league.teams.to_json(only: [:lat, :lng, :name, :logo], methods: [:logo_url]) %>'>
   </div>
   <br>
   <h2>Teams in this League</h2>
@@ -33,6 +40,7 @@
         <tr>
           <th>Name</th>
           <th>Country</th>
+          <th>City</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -41,6 +49,7 @@
           <tr>
             <td><%= team.name %></td>
             <td><%= team.location %></td>
+            <td><%= team.city %></td>
             <% if team.logo.attached? %>
             <td>
               <strong>Logo:</strong><br>
@@ -56,5 +65,18 @@
     </table>
   <% else %>
     <p>No teams in this league.</p>
+=======
+  <% if @league.logo.attached? %>
+  <p>
+    <strong>Logo:</strong><br>
+    <%= image_tag @league.logo, style: "max-width: 200px;" %>
+  </p>
+>>>>>>> Stashed changes
   <% end %>
+
+  <div class="btn-group" role="group">
+    <%= link_to "Edit", edit_league_path(@league), class: "btn btn-primary" %>
+    <%= link_to "Destroy", @league, method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-danger" %>
+    <%= link_to "Back to Leagues", leagues_path, class: "btn btn-secondary" %>
+  </div>
 </div>

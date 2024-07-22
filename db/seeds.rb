@@ -1,9 +1,19 @@
 require 'open-uri'
 require 'httparty'
+require 'json'
+require 'geocoder'
 
 # Definiowanie kluczy API
-API_KEY = '3d153bdce96c6416b79f57b8750b75c4'
+API_KEY = '703b9fe83fca655ad68df6455e60a8ad'
 API_HOST = 'api-football-v1.p.rapidapi.com'
+
+# Funkcja czyszcząca adres
+def clean_address(address)
+  address = address.gsub('&apos;', "'").gsub('&amp;', '&')
+  address = address.gsub(/[^\w\s,.-]/, '')
+  address.strip!
+  address
+end
 
 # Metoda do pobierania drużyn dla danej ligi
 def get_teams_for_league(league_id)
@@ -26,22 +36,44 @@ end
 def save_team_with_retry(team_data, league)
   retries = 3
   begin
+    venue = team_data['venue']
+    address = clean_address("#{venue['address']}, #{venue['city']}")
+
     team = Team.find_or_create_by(
       name: team_data['team']['name'],
       location: team_data['team']['country'],
       year: team_data['team']['founded'],
-      league: league
+      league: league,
+      address: venue['address'],
+      city: venue['city']
     )
-    
+
     if team_data['team']['logo'].present? && !team.logo.attached?
       logo_url = team_data['team']['logo']
       downloaded_logo = URI.open(logo_url)
       team.logo.attach(io: downloaded_logo, filename: "#{team_data['team']['name']}_logo.jpg")
     end
+
+    # Geokodowanie adresu i aktualizacja lat/lng
+    if team.address.present?
+      address_to_geocode = clean_address(team.address)
+      puts "Geokodowanie adresu: #{address_to_geocode}" # Dodaj ten log
+      geocoded = Geocoder.search(address_to_geocode).first
+      if geocoded
+        team.update(
+          lat: geocoded.latitude,
+          lng: geocoded.longitude
+        )
+        puts "Zaktualizowano współrzędne dla adresu #{team.address}: Lat: #{geocoded.latitude}, Lng: #{geocoded.longitude}"
+      else
+        puts "Geokodowanie nie powiodło się dla adresu #{team.address}"
+      end
+    end
+    
   rescue ActiveRecord::StatementInvalid => e
     if retries > 0 && e.message.include?("database is locked")
       retries -= 1
-      sleep(1) # Poczekaj sekundę przed ponowną próbą
+      sleep(1)
       retry
     else
       puts "Nieoczekiwany błąd podczas zapisywania drużyny #{team_data['team']['name']}: #{e.message}"
@@ -53,7 +85,7 @@ def save_team_with_retry(team_data, league)
   end
 end
 
-# Lista lig z ich ID (dopasuj je do lig w Twojej aplikacji)
+# Lista lig z ich ID
 leagues = {
   'Premier League' => 39, 
   'Major League Soccer' => 253,
@@ -81,6 +113,5 @@ leagues.each do |league_name, league_id|
     puts "Wiadomość błędu: #{response&.message}" if response&.message
   end
   
-  # Dodaj opóźnienie, aby uniknąć przekroczenia limitu zapytań
   sleep(2)
 end
