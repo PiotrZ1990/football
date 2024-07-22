@@ -7,12 +7,14 @@ class LeaguesController < ApplicationController
   # GET /leagues.json
   def index
     @leagues = League.all
+    
   end
 
   # GET /leagues/1
   # GET /leagues/1.json
   def show
     resize_logo if @league.logo.attached?
+    @teams = @league.teams.includes(:logo)
   end
 
   # GET /leagues/new
