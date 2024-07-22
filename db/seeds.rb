@@ -4,7 +4,7 @@ require 'json'
 require 'geocoder'
 
 # Definiowanie kluczy API
-API_KEY = '703b9fe83fca655ad68df6455e60a8ad'
+API_KEY = 'fd4f51d1f37933186594c51db37a20e9'
 API_HOST = 'api-football-v1.p.rapidapi.com'
 
 # Funkcja czyszcząca adres
@@ -36,7 +36,7 @@ end
 def save_team_with_retry(team_data, league)
   retries = 3
   begin
-    venue = team_data['venue']
+    venue = team_data['venue'] || {}
     address = clean_address("#{venue['address']}, #{venue['city']}")
 
     team = Team.find_or_create_by(
@@ -89,7 +89,7 @@ end
 leagues = {
   'Premier League' => 39, 
   'Major League Soccer' => 253,
-  'Serie A' => 71,
+  'Serie A' => 135,
   'Bundesliga' => 78,
   'Ligue 1' => 61,
   'Eredivisie' => 88
