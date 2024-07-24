@@ -1,5 +1,5 @@
 class TeamsController < ApplicationController
-  before_action :set_team, only: %i[show edit update destroy]
+  before_action :set_team, only: %i[show edit update destroy history]
 
   # GET /teams
   def index
@@ -8,6 +8,16 @@ class TeamsController < ApplicationController
 
   # GET /teams/1
   def show
+  end
+
+  # GET /teams/1/history
+  def history
+    if @team.league
+      matches = @team.league.matches.where("home_team_id = ? OR away_team_id = ?", @team.id, @team.id)
+      render json: { matches: matches.map { |match| match_details(match) } }
+    else
+      render json: { error: 'League not found for this team' }, status: :not_found
+    end
   end
 
   # GET /teams/new
@@ -53,5 +63,30 @@ class TeamsController < ApplicationController
 
   def team_params
     params.require(:team).permit(:name, :city, :logo, :lat, :lng)
+  end
+
+def match_details(match)
+  {
+    home_team: match.home_team.name,
+    away_team: match.away_team.name,
+    home_score: match.home_score,
+    away_score: match.away_score,
+    outcome: determine_outcome(match),
+    home_team_lat: match.home_team.lat,
+    home_team_lng: match.home_team.lng,
+    away_team_lat: match.away_team.lat,
+    away_team_lng: match.away_team.lng
+  }
+end
+
+
+  def determine_outcome(match)
+    if match.home_score > match.away_score
+      match.home_team_id == @team.id ? 'Win' : 'Loss'
+    elsif match.home_score < match.away_score
+      match.home_team_id == @team.id ? 'Loss' : 'Win'
+    else
+      'Draw'
+    end
   end
 end

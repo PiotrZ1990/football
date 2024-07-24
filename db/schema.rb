@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_21_163751) do
+ActiveRecord::Schema[7.1].define(version: 2024_07_24_140347) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -47,6 +47,22 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_21_163751) do
     t.string "image"
   end
 
+  create_table "matches", force: :cascade do |t|
+    t.integer "league_id", null: false
+    t.integer "season", null: false
+    t.date "date", null: false
+    t.integer "home_team_id", null: false
+    t.integer "away_team_id", null: false
+    t.integer "home_score", null: false
+    t.integer "away_score", null: false
+    t.string "result", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["away_team_id"], name: "index_matches_on_away_team_id"
+    t.index ["home_team_id"], name: "index_matches_on_home_team_id"
+    t.index ["league_id"], name: "index_matches_on_league_id"
+  end
+
   create_table "teams", force: :cascade do |t|
     t.string "name"
     t.string "location"
@@ -63,5 +79,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_21_163751) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "matches", "leagues"
+  add_foreign_key "matches", "teams", column: "away_team_id"
+  add_foreign_key "matches", "teams", column: "home_team_id"
   add_foreign_key "teams", "leagues"
 end
