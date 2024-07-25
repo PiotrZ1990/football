@@ -120,6 +120,9 @@ def save_match_with_retry(match_data, league)
       return
     end
 
+    # Zakładam, że round_number jest częścią match_data['league']
+    round_number = match_data['league']['round'].match(/\d+/)[0].to_i rescue nil
+
     Match.create!(
       league: league,
       season: match_data['league']['season'],
@@ -128,7 +131,8 @@ def save_match_with_retry(match_data, league)
       away_team: away_team,
       home_score: home_score,
       away_score: away_score,
-      result: determine_result(home_score, away_score)
+      result: determine_result(home_score, away_score),
+      round_number: round_number
     )
 
   rescue ActiveRecord::StatementInvalid => e

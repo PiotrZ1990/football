@@ -91,17 +91,38 @@ document.addEventListener('DOMContentLoaded', () => {
       const homeLatLng = [match.home_team_lat, match.home_team_lng];
       const awayLatLng = [match.away_team_lat, match.away_team_lng];
 
-      // Determine color based on outcome
-      const color = match.outcome === 'Win' ? 'green' : (match.outcome === 'Loss' ? 'red' : 'gray');
-
       // Add new markers if map is initialized
       if (map) {
         if (homeLatLng) {
-          const homeMarker = L.circle(homeLatLng, { color: color, radius: 5000 }).addTo(map);
+          const homeIcon = L.icon({
+            iconUrl: match.home_team_logo,
+            iconSize: [40, 40],
+            iconAnchor: [20, 40]
+          });
+
+          const homeMarker = L.marker(homeLatLng, { icon: homeIcon }).addTo(map);
+          homeMarker.bindPopup(`
+            <b>Home Team:</b> ${match.home_team}<br>
+            <b>Away Team:</b> ${match.away_team}<br>
+            <b>Score:</b> ${match.home_score} - ${match.away_score}<br>
+            <b>Outcome:</b> ${match.outcome}
+          `);
           matchMarkers.push(homeMarker);
         }
         if (awayLatLng) {
-          const awayMarker = L.circle(awayLatLng, { color: color, radius: 5000 }).addTo(map);
+          const awayIcon = L.icon({
+            iconUrl: match.away_team_logo,
+            iconSize: [40, 40],
+            iconAnchor: [20, 40]
+          });
+
+          const awayMarker = L.marker(awayLatLng, { icon: awayIcon }).addTo(map);
+          awayMarker.bindPopup(`
+            <b>Home Team:</b> ${match.home_team}<br>
+            <b>Away Team:</b> ${match.away_team}<br>
+            <b>Score:</b> ${match.home_score} - ${match.away_score}<br>
+            <b>Outcome:</b> ${match.outcome}
+          `);
           matchMarkers.push(awayMarker);
         }
       }
