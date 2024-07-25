@@ -60,6 +60,10 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
           matchData = data.matches;
+          
+          // Sortowanie danych chronologicznie według daty meczu
+          matchData.sort((a, b) => new Date(a.date) - new Date(b.date));
+
           historyElement.style.display = 'block';
           startHighlighting();
         })
