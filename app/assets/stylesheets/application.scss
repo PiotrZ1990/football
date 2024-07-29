@@ -56,11 +56,17 @@
   border-top: 20px solid #ff0000; /* Kolor stożka */
 }
 
-/* Kontener dla mapy i tabeli historii */
+/* Kontener dla mapy, tabeli historii i tabeli rankingu */
+.map-history-ranking-container {
+  display: flex;
+  flex-direction: column; /* Ustawia kolumnowy układ dla całego kontenera */
+  gap: 20px; /* Odstęp między elementami kontenera */
+}
+
+/* Kontener dla mapy i tabeli historii w poziomie */
 .map-history-container {
   display: flex;
   gap: 20px; /* Odstęp między mapą a tabelą historii */
-  flex-direction: row; /* Ustawia układ poziomy */
   flex: 1; /* Pozwól kontenerowi wypełniać dostępne miejsce */
 }
 
@@ -81,13 +87,6 @@
 }
 
 /* Kontener dla tabeli rankingu */
-#ranking-container {
-  display: flex;
-  flex-direction: column; /* Ustawia kolumnowy układ */
-  margin-top: 20px; /* Odstęp od kontenera mapy i tabeli historii */
-}
-
-/* Styl dla tabeli rankingu */
 #ranking {
   border-top: 1px solid #ddd; /* Opcjonalnie: Dodaje górną granicę */
 }

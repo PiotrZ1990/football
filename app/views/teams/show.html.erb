@@ -34,35 +34,38 @@
 
 <br>
 
-<!-- Kontener dla mapy i tabeli -->
-<div class="map-history-container">
-  <!-- Kontener mapy -->
-  <div id="map" style="height: 500px; width: 100%; display: none;"
-       data-lat="<%= @team.lat %>" 
-       data-lng="<%= @team.lng %>" 
-       data-logo="<%= url_for(@team.logo) %>"
-       data-name="<%= @team.name %>" 
-       data-city="<%= @team.city %>">
+<!-- Kontener dla mapy, tabeli historii i tabeli rankingu -->
+<div class="map-history-ranking-container">
+  <!-- Kontener mapy i tabeli historii -->
+  <div class="map-history-container">
+    <!-- Kontener mapy -->
+    <div id="map" 
+         data-lat="<%= @team.lat %>" 
+         data-lng="<%= @team.lng %>" 
+         data-logo="<%= url_for(@team.logo) %>"
+         data-name="<%= @team.name %>" 
+         data-city="<%= @team.city %>">
+    </div>
+
+    <!-- Kontener historii meczów -->
+    <div id="history" style="display: none;" data-team-id="<%= @team.id %>">
+      <h2>Match History</h2>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Home Team</th>
+            <th>Away Team</th>
+            <th>Score</th>
+            <th>Outcome</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <!-- Kontener historii meczów -->
-  <div id="history" style="display: none;" data-team-id="<%= @team.id %>">
-    <h2>Match History</h2>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Home Team</th>
-          <th>Away Team</th>
-          <th>Score</th>
-          <th>Outcome</th>
-        </tr>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Kontener rankingu -->
+  <!-- Kontener dla tabeli rankingu -->
   <div id="ranking" style="display: none;">
     <h2>League Ranking</h2>
     <table class="table table-striped">
@@ -79,6 +82,4 @@
       </tbody>
     </table>
   </div>
-</div>
-
 </div>
