@@ -16,16 +16,18 @@ class TeamsController < ApplicationController
       matches = @team.league.matches.where("home_team_id = ? OR away_team_id = ?", @team.id, @team.id)
       league_teams = @team.league.teams
 
-      if matches.any?
-        render json: {
-          matches: matches.map { |match| match_details(match) },
-          league_teams: league_teams.map { |team| team_details(team) }.sort_by { |team| -team[:points] }
-        }
-      else
-        render json: { message: 'No matches found for this team' }, status: :ok
+      @match_details = matches.map { |match| match_details(match) }
+      @league_teams = league_teams.map { |team| team_details(team) }.sort_by { |team| -team[:points] }
+
+      respond_to do |format|
+        # format.html # Możesz utworzyć history.html.erb, jeśli chcesz używać HTML
+        format.json { render json: { matches: @match_details, league_teams: @league_teams } }
       end
     else
-      render json: { error: 'League not found for this team' }, status: :not_found
+      respond_to do |format|
+        format.html { render plain: 'League not found for this team', status: :not_found }
+        format.json { render json: { error: 'League not found for this team' }, status: :not_found }
+      end
     end
   end
 
@@ -101,12 +103,9 @@ class TeamsController < ApplicationController
   end
 
   def team_details(team)
-    home_matches = team.home_matches
-    away_matches = team.away_matches
-
-    matches_played = home_matches.count + away_matches.count
-    wins = home_matches.where('home_score > away_score').count + away_matches.where('away_score > home_score').count
-    draws = home_matches.where('home_score = away_score').count + away_matches.where('home_score = away_score').count
+    matches_played = team.home_matches.count + team.away_matches.count
+    wins = team.home_matches.where('home_score > away_score').count + team.away_matches.where('away_score > home_score').count
+    draws = team.home_matches.where('home_score = away_score').count + team.away_matches.where('home_score = away_score').count
     points = (wins * 3) + draws
 
     {

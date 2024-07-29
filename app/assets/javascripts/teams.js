@@ -17,9 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function initializeTeamData(teams) {
     teamData = teams.map(team => ({
       name: team.name,
-      matches: 0,
-      wins: 0,
-      points: 0
+      matches: team.matches || 0,
+      wins: team.wins || 0,
+      points: team.points || 0
     }));
     populateRankingTable(teamData);
   }
@@ -144,7 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const homeLatLng = [match.home_team_lat, match.home_team_lng];
       const awayLatLng = [match.away_team_lat, match.away_team_lng];
 
-      // Add new markers if map is initialized
       if (map) {
         if (homeLatLng) {
           const homeIcon = L.icon({
@@ -180,7 +179,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Append the corresponding row to the table and make it visible
       const tbody = historyElement.querySelector('tbody');
       const row = document.createElement('tr');
       row.innerHTML = `
@@ -191,54 +189,50 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       tbody.appendChild(row);
 
-      // Highlight the row
-      row.style.opacity = 0; // Initially hide the row
+      row.style.opacity = 0; 
       setTimeout(() => {
         row.style.transition = 'opacity 1s';
-        row.style.opacity = 1; // Fade in
+        row.style.opacity = 1; 
       }, 0);
 
-      // Scroll to the new row
       row.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
-      // Update league ranking
-      updateRanking(match);
+      // updateRanking(match);
 
       currentIndex++;
     }, 2000);
   }
 
-  function updateRanking(match) {
-    // Find the teams in the teamData array
-    const homeTeam = teamData.find(team => team.name === match.home_team);
-    const awayTeam = teamData.find(team => team.name === match.away_team);
+  // function updateRanking(match) {
+  //   const homeTeam = teamData.find(team => team.name === match.home_team);
+  //   const awayTeam = teamData.find(team => team.name === match.away_team);
 
-    // Update match count
-    if (homeTeam) homeTeam.matches++;
-    if (awayTeam) awayTeam.matches++;
+  //   if (!homeTeam && !awayTeam) return; // Do nothing if no teams found
 
-    // Update wins and points based on match outcome
-    if (match.outcome === 'Win') {
-      if (homeTeam) {
-        homeTeam.wins++;
-        homeTeam.points += 3;
-      }
-      if (awayTeam) awayTeam.points += 0; // Away team loses, so no points
-    } else if (match.outcome === 'Loss') {
-      if (awayTeam) {
-        awayTeam.wins++;
-        awayTeam.points += 3;
-      }
-      if (homeTeam) homeTeam.points += 0; // Home team loses, so no points
-    } else if (match.outcome === 'Draw') {
-      if (homeTeam) homeTeam.points++;
-      if (awayTeam) awayTeam.points++;
-    }
+  //   if (homeTeam) {
+  //     homeTeam.matches++;
+  //     if (match.outcome === 'Win') {
+  //       homeTeam.wins++;
+  //       homeTeam.points += 3;
+  //     } else if (match.outcome === 'Draw') {
+  //       homeTeam.points++;
+  //     }
+  //   }
 
-    // Sort teams by points (and optionally by other criteria, e.g., wins)
-    teamData.sort((a, b) => b.points - a.points || b.wins - a.wins);
+  //   if (awayTeam) {
+  //     awayTeam.matches++;
+  //     if (match.outcome === 'Loss') {
+  //       awayTeam.wins++;
+  //       awayTeam.points += 3;
+  //     } else if (match.outcome === 'Draw') {
+  //       awayTeam.points++;
+  //     }
+  //   }
 
-    // Update ranking table dynamically
-    populateRankingTable(teamData);
-  }
+  //   // Sort teams by points (and optionally by other criteria, e.g., wins)
+  //   teamData.sort((a, b) => b.points - a.points || b.wins - a.wins);
+
+  //   // Update ranking table dynamically
+  //   populateRankingTable(teamData);
+  // }
 });
