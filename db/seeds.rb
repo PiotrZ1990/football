@@ -41,36 +41,40 @@ def save_team_with_retry(team_data, league)
     venue = team_data['venue'] || {}
     address = clean_address("#{venue['address']}, #{venue['city']}")
 
-    team = Team.find_or_create_by(
+    team = Team.find_or_initialize_by(
       name: team_data['team']['name'],
       location: team_data['team']['country'],
-      year: team_data['team']['founded'],
-      league: league,
-      address: venue['address'],
-      city: venue['city']
+      league: league
     )
+    
+    # Ustal dane tylko dla nowych drużyn
+    if team.new_record?
+      team.year = team_data['team']['founded']
+      team.address = venue['address']
+      team.city = venue['city']
 
-    if team_data['team']['logo'].present? && !team.logo.attached?
-      logo_url = team_data['team']['logo']
-      downloaded_logo = URI.open(logo_url)
-      team.logo.attach(io: downloaded_logo, filename: "#{team_data['team']['name']}_logo.jpg")
-    end
+      if team_data['team']['logo'].present?
+        logo_url = team_data['team']['logo']
+        downloaded_logo = URI.open(logo_url)
+        team.logo.attach(io: downloaded_logo, filename: "#{team_data['team']['name']}_logo.jpg")
+      end
 
-    # Geokodowanie adresu i aktualizacja lat/lng
-    if team.address.present?
-      address_to_geocode = clean_address(team.address)
-      puts "Geokodowanie adresu: #{address_to_geocode}" # Dodaj ten log
-      geocoded = Geocoder.search(address_to_geocode).first
-      if geocoded
-        team.update(
-          lat: geocoded.latitude,
-          lng: geocoded.longitude
-        )
-        puts "Zaktualizowano współrzędne dla adresu #{team.address}: Lat: #{geocoded.latitude}, Lng: #{geocoded.longitude}"
-      else
-        puts "Geokodowanie nie powiodło się dla adresu #{team.address}"
+      # Geokodowanie adresu i aktualizacja lat/lng
+      if team.address.present?
+        address_to_geocode = clean_address(team.address)
+        puts "Geokodowanie adresu: #{address_to_geocode}" # Dodaj ten log
+        geocoded = Geocoder.search(address_to_geocode).first
+        if geocoded
+          team.lat = geocoded.latitude
+          team.lng = geocoded.longitude
+          puts "Zaktualizowano współrzędne dla adresu #{team.address}: Lat: #{geocoded.latitude}, Lng: #{geocoded.longitude}"
+        else
+          puts "Geokodowanie nie powiodło się dla adresu #{team.address}"
+        end
       end
     end
+
+    team.save!
     
   rescue ActiveRecord::StatementInvalid => e
     if retries > 0 && e.message.include?("database is locked")
@@ -122,6 +126,20 @@ def save_match_with_retry(match_data, league)
 
     # Zakładam, że round_number jest częścią match_data['league']
     round_number = match_data['league']['round'].match(/\d+/)[0].to_i rescue nil
+
+    # Sprawdź, czy mecz już istnieje
+    existing_match = Match.find_by(
+      league: league,
+      season: match_data['league']['season'],
+      date: match_data['fixture']['date'],
+      home_team: home_team,
+      away_team: away_team
+    )
+
+    if existing_match
+      puts "Mecz pomiędzy #{home_team.name} a #{away_team.name} już istnieje, pominięcie zapisu."
+      return
+    end
 
     Match.create!(
       league: league,

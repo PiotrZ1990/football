@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_25_110057) do
+ActiveRecord::Schema[7.1].define(version: 2024_07_29_164430) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -61,6 +61,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_25_110057) do
     t.string "round_number"
     t.index ["away_team_id"], name: "index_matches_on_away_team_id"
     t.index ["home_team_id"], name: "index_matches_on_home_team_id"
+    t.index ["league_id", "season", "date", "home_team_id", "away_team_id"], name: "unique_match_index", unique: true
     t.index ["league_id"], name: "index_matches_on_league_id"
   end
 

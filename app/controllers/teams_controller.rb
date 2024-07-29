@@ -14,8 +14,13 @@ class TeamsController < ApplicationController
   def history
     if @team.league
       matches = @team.league.matches.where("home_team_id = ? OR away_team_id = ?", @team.id, @team.id)
+      league_teams = @team.league.teams
+
       if matches.any?
-        render json: { matches: matches.map { |match| match_details(match) } }
+        render json: {
+          matches: matches.map { |match| match_details(match) },
+          league_teams: league_teams.map { |team| team_details(team) }.sort_by { |team| -team[:points] }
+        }
       else
         render json: { message: 'No matches found for this team' }, status: :ok
       end
@@ -93,5 +98,23 @@ class TeamsController < ApplicationController
     else
       'Draw'
     end
+  end
+
+  def team_details(team)
+    home_matches = team.home_matches
+    away_matches = team.away_matches
+
+    matches_played = home_matches.count + away_matches.count
+    wins = home_matches.where('home_score > away_score').count + away_matches.where('away_score > home_score').count
+    draws = home_matches.where('home_score = away_score').count + away_matches.where('home_score = away_score').count
+    points = (wins * 3) + draws
+
+    {
+      id: team.id,
+      name: team.name,
+      matches: matches_played,
+      wins: wins,
+      points: points
+    }
   end
 end

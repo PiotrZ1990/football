@@ -56,6 +56,50 @@
   border-top: 20px solid #ff0000; /* Kolor stożka */
 }
 
+/* Kontener dla mapy i tabeli historii */
+.map-history-container {
+  display: flex;
+  gap: 20px; /* Odstęp między mapą a tabelą historii */
+  flex-direction: row; /* Ustawia układ poziomy */
+  flex: 1; /* Pozwól kontenerowi wypełniać dostępne miejsce */
+}
+
+/* Styl dla mapy */
+#map {
+  flex: 2; /* Mapa zajmuje większą część kontenera */
+  max-width: 100%;
+  height: 500px; /* Ustawienie wysokości mapy */
+  display: none; /* Ukrywa mapę domyślnie */
+}
+
+/* Styl dla tabeli historii meczów */
+#history {
+  flex: 1; /* Tabela historii zajmuje mniejszą część kontenera */
+  overflow-y: auto; /* Umożliwia przewijanie, jeśli tabela jest zbyt długa */
+  max-height: 500px; /* Ustawienie maksymalnej wysokości dla tabeli */
+  border-left: 1px solid #ddd; /* Opcjonalnie: Dodaje lewą granicę */
+}
+
+/* Kontener dla tabeli rankingu */
+#ranking-container {
+  display: flex;
+  flex-direction: column; /* Ustawia kolumnowy układ */
+  margin-top: 20px; /* Odstęp od kontenera mapy i tabeli historii */
+}
+
+/* Styl dla tabeli rankingu */
+#ranking {
+  border-top: 1px solid #ddd; /* Opcjonalnie: Dodaje górną granicę */
+}
+
+/* Styl dla nagłówków tabeli, aby były widoczne podczas przewijania */
+table.table thead th {
+  position: sticky;
+  top: 0;
+  background-color: #f8f9fa; /* Kolor tła nagłówków */
+  z-index: 1; /* Aby nagłówki były nad innymi elementami */
+}
+
 /* Styl dla wierszy tabeli */
 table.table tbody tr.highlighted {
   background-color: #f0f0f0 !important; /* Jasno szare tło dla podświetlonych wierszy */
@@ -69,33 +113,4 @@ table.table tbody tr {
 /* Dla animacji fade-in nowych wierszy tabeli */
 table tbody tr {
   transition: opacity 1s;
-}
-
-/* Kontener dla mapy i tabeli */
-.map-history-container {
-  display: flex;
-  gap: 20px; /* Odstęp między mapą a tabelą */
-}
-
-/* Styl dla mapy */
-#map {
-  flex: 2;
-  max-width: 100%;
-  height: 500px; /* Ustawienie wysokości mapy */
-  display: none; /* Ukrywa mapę domyślnie */
-}
-
-/* Styl dla tabeli */
-#history {
-  flex: 1;
-  overflow-y: auto; /* Umożliwia przewijanie, jeśli tabela jest zbyt długa */
-  max-height: 500px; /* Ustawienie maksymalnej wysokości dla tabeli */
-}
-
-/* Styl dla nagłówków tabeli, aby były widoczne podczas przewijania */
-table.table thead th {
-  position: sticky;
-  top: 0;
-  background-color: #f8f9fa; /* Kolor tła nagłówków */
-  z-index: 1; /* Aby nagłówki były nad innymi elementami */
 }
