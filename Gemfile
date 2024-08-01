@@ -30,6 +30,8 @@ gem 'leaflet-rails'
 
 gem 'geocoder'
 
+gem 'slim-rails'
+
 # Use Redis adapter to run Action Cable in production
 # gem "redis", ">= 4.0.1"
 

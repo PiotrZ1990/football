@@ -7,7 +7,6 @@ class LeaguesController < ApplicationController
   # GET /leagues.json
   def index
     @leagues = League.all
-    
   end
 
   # GET /leagues/1
@@ -75,7 +74,9 @@ class LeaguesController < ApplicationController
 
   # Resize league logo using ChunkyPNG
   def resize_logo
-    if @league.logo.attached?
+    return unless @league.logo.attached?
+
+    begin
       logo_path = ActiveStorage::Blob.service.path_for(@league.logo.key)
 
       # Load image using ChunkyPNG
@@ -94,9 +95,12 @@ class LeaguesController < ApplicationController
       # Attach the resized image as @resized_logo
       @resized_logo_path = temp_png.path
 
-      # Cleanup temporary file after rendering the view
+    rescue StandardError => e
+      logger.error "Failed to resize logo: #{e.message}"
+      # Handle error or notify user
+    ensure
       temp_png.close
-      at_exit { temp_png.unlink }
+      temp_png.unlink if temp_png
     end
   end
 

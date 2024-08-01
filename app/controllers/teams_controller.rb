@@ -20,7 +20,7 @@ class TeamsController < ApplicationController
       @league_teams = league_teams.map { |team| team_details(team) }.sort_by { |team| -team[:points] }
 
       respond_to do |format|
-        # format.html # Możesz utworzyć history.html.erb, jeśli chcesz używać HTML
+        # format.html # Jeśli używasz HTML, upewnij się, że odpowiedni widok istnieje
         format.json { render json: { matches: @match_details, league_teams: @league_teams } }
       end
     else

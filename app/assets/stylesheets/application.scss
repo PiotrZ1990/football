@@ -4,12 +4,14 @@
 
 @import "bootstrap";
 
+// Styl dla grup formularzy
 .form-group {
   width: 50%;
   margin-left: auto;
   margin-right: auto;
 }
 
+// Styl dla kontenera strony z detalami ligi
 #league-show {
   max-width: 600px;
   margin: 0 auto;
@@ -23,22 +25,23 @@
   height: auto;
 }
 
+// Styl dla kontenera z treścią wyśrodkowaną
 .center-content {
   text-align: center;
   margin-top: 20px;
 }
 
-/* Styl dla SVG z logo */
+// Styl dla ikon SVG
 .icon-svg {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 60px; /* Szerokość ikony */
-  height: 80px; /* Wysokość ikony */
+  width: 60px;
+  height: 80px;
   position: relative;
 }
 
-/* Styl dla pinezki */
+// Styl dla pinezki
 .icon-container {
   position: relative;
 }
@@ -53,63 +56,63 @@
   height: 0;
   border-left: 15px solid transparent;
   border-right: 15px solid transparent;
-  border-top: 20px solid #ff0000; /* Kolor stożka */
+  border-top: 20px solid #ff0000;
 }
 
-/* Kontener dla mapy, tabeli historii i tabeli rankingu */
+// Kontener dla mapy, tabeli historii i tabeli rankingu
 .map-history-ranking-container {
   display: flex;
-  flex-direction: column; /* Ustawia kolumnowy układ dla całego kontenera */
-  gap: 20px; /* Odstęp między elementami kontenera */
+  flex-direction: column;
+  gap: 20px;
 }
 
-/* Kontener dla mapy i tabeli historii w poziomie */
+// Kontener dla mapy i tabeli historii w poziomie
 .map-history-container {
   display: flex;
-  gap: 20px; /* Odstęp między mapą a tabelą historii */
-  flex: 1; /* Pozwól kontenerowi wypełniać dostępne miejsce */
+  gap: 20px;
+  flex: 1;
 }
 
-/* Styl dla mapy */
+// Styl dla mapy
 #map {
-  flex: 2; /* Mapa zajmuje większą część kontenera */
+  flex: 2;
   max-width: 100%;
-  height: 500px; /* Ustawienie wysokości mapy */
-  display: none; /* Ukrywa mapę domyślnie */
+  height: 500px;
+  display: none;
 }
 
-/* Styl dla tabeli historii meczów */
+// Styl dla tabeli historii meczów
 #history {
-  flex: 1; /* Tabela historii zajmuje mniejszą część kontenera */
-  overflow-y: auto; /* Umożliwia przewijanie, jeśli tabela jest zbyt długa */
-  max-height: 500px; /* Ustawienie maksymalnej wysokości dla tabeli */
-  border-left: 1px solid #ddd; /* Opcjonalnie: Dodaje lewą granicę */
+  flex: 1;
+  overflow-y: auto;
+  max-height: 500px;
+  border-left: 1px solid #ddd;
 }
 
-/* Kontener dla tabeli rankingu */
+// Kontener dla tabeli rankingu
 #ranking {
-  border-top: 1px solid #ddd; /* Opcjonalnie: Dodaje górną granicę */
+  border-top: 1px solid #ddd;
 }
 
-/* Styl dla nagłówków tabeli, aby były widoczne podczas przewijania */
+// Styl dla nagłówków tabeli, aby były widoczne podczas przewijania
 table.table thead th {
   position: sticky;
   top: 0;
-  background-color: #f8f9fa; /* Kolor tła nagłówków */
-  z-index: 1; /* Aby nagłówki były nad innymi elementami */
+  background-color: #f8f9fa;
+  z-index: 1;
 }
 
-/* Styl dla wierszy tabeli */
+// Styl dla wierszy tabeli
 table.table tbody tr.highlighted {
-  background-color: #f0f0f0 !important; /* Jasno szare tło dla podświetlonych wierszy */
+  background-color: #f0f0f0 !important;
 }
 
-/* Styl dla pozostałych wierszy */
+// Styl dla pozostałych wierszy
 table.table tbody tr {
-  transition: background-color 0.5s; /* Płynne przejście zmiany koloru tła */
+  transition: background-color 0.5s;
 }
 
-/* Dla animacji fade-in nowych wierszy tabeli */
+// Styl dla animacji fade-in nowych wierszy tabeli
 table tbody tr {
   transition: opacity 1s;
 }
