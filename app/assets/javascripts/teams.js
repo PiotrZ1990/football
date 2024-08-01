@@ -15,6 +15,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const currentTeamId = rankingElement.dataset.currentTeamId; // Pobierz ID drużyny z danych elementu
 
+  // Load ranking data with AJAX
+  function loadRankingData() {
+    fetch('/teams/ranking')
+      .then(response => response.json())
+      .then(data => {
+        initializeTeamData(data);
+      })
+      .catch(error => console.error('Error fetching ranking data:', error));
+  }
+
   // Initialize teamData with zeroed values
   function initializeTeamData(teams) {
     teamData = teams.map(team => ({
@@ -38,11 +48,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const isCurrentTeam = team.id === parseInt(currentTeamId, 10); // Sprawdź, czy to obecna drużyna
 
       rankingRow.innerHTML = `
-        <td>${index + 1}</td>
+        <td class="${isCurrentTeam ? 'table-success' : ''}">${index + 1}</td>
         <td class="${isCurrentTeam ? 'table-success' : ''}">${team.name}</td>
-        <td>${team.matches}</td>
-        <td>${team.wins}</td>
-        <td>${team.points}</td>
+        <td class="${isCurrentTeam ? 'table-success' : ''}">${team.matches}</td>
+        <td class="${isCurrentTeam ? 'table-success' : ''}">${team.wins}</td>
+        <td class="${isCurrentTeam ? 'table-success' : ''}">${team.points}</td>
       `;
       rankingTbody.appendChild(rankingRow);
     });
@@ -208,4 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
       currentIndex++;
     }, 2000);
   }
+
+  // Initial load of ranking data
+  loadRankingData();
 });

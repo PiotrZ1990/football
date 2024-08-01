@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   end
   resources :teams do
     member do
-      get :history
+      get 'history'
     end
   end
 
