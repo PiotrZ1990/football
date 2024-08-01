@@ -1,6 +1,6 @@
 /*
-*= require leaflet
-*/
+ *= require leaflet
+ */
 
 @import "bootstrap";
 
@@ -59,39 +59,26 @@
   border-top: 20px solid #ff0000;
 }
 
-// Kontener dla mapy, tabeli historii i tabeli rankingu
+// Styl dla kontenera mapy, tabeli historii i tabeli rankingu
 .map-history-ranking-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  margin-top: 20px;
 }
 
-// Kontener dla mapy i tabeli historii w poziomie
-.map-history-container {
+// Styl dla mapy, tabeli historii i tabeli rankingu w jednym rzędzie
+.row.map-history-ranking-row {
   display: flex;
-  gap: 20px;
-  flex: 1;
 }
 
 // Styl dla mapy
 #map {
-  flex: 2;
-  max-width: 100%;
-  height: 500px;
-  display: none;
+  height: 500px; // Zapewnienie, że mapa zajmuje odpowiednią wysokość
+  display: none; // Ukrycie mapy początkowo
 }
 
-// Styl dla tabeli historii meczów
-#history {
-  flex: 1;
-  overflow-y: auto;
+// Styl dla tabeli historii meczów i tabeli rankingu
+#history, #ranking {
   max-height: 500px;
-  border-left: 1px solid #ddd;
-}
-
-// Kontener dla tabeli rankingu
-#ranking {
-  border-top: 1px solid #ddd;
+  overflow-y: auto;
 }
 
 // Styl dla nagłówków tabeli, aby były widoczne podczas przewijania

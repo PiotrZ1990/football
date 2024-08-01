@@ -26,39 +26,41 @@ div id=dom_id(@team) class="text-center"
     = link_to 'Show on Map', '#', id: 'show-on-map', class: 'btn btn-info'
     = link_to 'Show History', '#', id: 'show-history', class: 'btn btn-primary'
 
-br
-
-.map-history-ranking-container
-  .map-history-container
-    #map(
-      data-lat=@team.lat
-      data-lng=@team.lng
-      data-logo=url_for(@team.logo)
-      data-name=@team.name
-      data-city=@team.city
-    )
-
-    #history(style="display: none;" data-team-id=@team.id)
-      h2 Match History
-      table.table.table-striped
-        thead
-          tr
-            th Home Team
-            th Away Team
-            th Score
-            th Outcome
-        tbody
-
   br
 
-  #ranking(style="display: none;")
-    h2 League Ranking
-    table.table.table-striped
-      thead
-        tr
-          th Ranking
-          th Team
-          th Matches
-          th Wins
-          th Points
-      tbody
+  .container.map-history-ranking-container
+    .row.map-history-ranking-row
+      .col-md-4
+        #map(
+          data-lat=@team.lat
+          data-lng=@team.lng
+          data-logo=url_for(@team.logo)
+          data-name=@team.name
+          data-city=@team.city
+          style="height: 500px; display: none;"
+        )
+
+      .col-md-4
+        #history.table-responsive(style="display: none; max-height: 500px; overflow-y: auto;" data-team-id=@team.id)
+          h2 Match History
+          table.table.table-striped
+            thead
+              tr
+                th Home Team
+                th Away Team
+                th Score
+                th Outcome
+            tbody
+
+      .col-md-4
+        #ranking.table-responsive(style="display: none; max-height: 500px; overflow-y: auto;")
+          h2 League Ranking
+          table.table.table-striped
+            thead
+              tr
+                th Ranking
+                th Team
+                th Matches
+                th Wins
+                th Points
+            tbody
