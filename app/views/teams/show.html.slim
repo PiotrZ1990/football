@@ -53,7 +53,7 @@ div id=dom_id(@team) class="text-center"
             tbody
 
       .col-md-4
-        #ranking.table-responsive(style="display: none; max-height: 500px; overflow-y: auto;")
+        #ranking.table-responsive(style="display: none; max-height: 500px; overflow-y: auto;" data-current-team-id=@team.id)
           h2 League Ranking
           table.table.table-striped
             thead
@@ -64,3 +64,4 @@ div id=dom_id(@team) class="text-center"
                 th Wins
                 th Points
             tbody
+

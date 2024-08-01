@@ -13,9 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
   let interval;
   let map;
 
+  const currentTeamId = rankingElement.dataset.currentTeamId; // Pobierz ID drużyny z danych elementu
+
   // Initialize teamData with zeroed values
   function initializeTeamData(teams) {
     teamData = teams.map(team => ({
+      id: team.id,
       name: team.name,
       matches: team.matches || 0,
       wins: team.wins || 0,
@@ -27,13 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Populate the ranking table with the initial team data
   function populateRankingTable(teams) {
     const rankingTbody = rankingElement.querySelector('tbody');
+
     rankingTbody.innerHTML = ''; // Clear any existing ranking
 
     teams.forEach((team, index) => {
       const rankingRow = document.createElement('tr');
+      const isCurrentTeam = team.id === parseInt(currentTeamId, 10); // Sprawdź, czy to obecna drużyna
+
       rankingRow.innerHTML = `
         <td>${index + 1}</td>
-        <td>${team.name}</td>
+        <td class="${isCurrentTeam ? 'table-success' : ''}">${team.name}</td>
         <td>${team.matches}</td>
         <td>${team.wins}</td>
         <td>${team.points}</td>
@@ -202,37 +208,4 @@ document.addEventListener('DOMContentLoaded', () => {
       currentIndex++;
     }, 2000);
   }
-
-  // function updateRanking(match) {
-  //   const homeTeam = teamData.find(team => team.name === match.home_team);
-  //   const awayTeam = teamData.find(team => team.name === match.away_team);
-
-  //   if (!homeTeam && !awayTeam) return; // Do nothing if no teams found
-
-  //   if (homeTeam) {
-  //     homeTeam.matches++;
-  //     if (match.outcome === 'Win') {
-  //       homeTeam.wins++;
-  //       homeTeam.points += 3;
-  //     } else if (match.outcome === 'Draw') {
-  //       homeTeam.points++;
-  //     }
-  //   }
-
-  //   if (awayTeam) {
-  //     awayTeam.matches++;
-  //     if (match.outcome === 'Loss') {
-  //       awayTeam.wins++;
-  //       awayTeam.points += 3;
-  //     } else if (match.outcome === 'Draw') {
-  //       awayTeam.points++;
-  //     }
-  //   }
-
-  //   // Sort teams by points (and optionally by other criteria, e.g., wins)
-  //   teamData.sort((a, b) => b.points - a.points || b.wins - a.wins);
-
-  //   // Update ranking table dynamically
-  //   populateRankingTable(teamData);
-  // }
 });
