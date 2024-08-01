@@ -1,0 +1,23 @@
+= form_with model: league, local: true, html: { multipart: true } do |form|
+  - if league.errors.any?
+    #error_explanation.alert.alert-danger
+      h2 = pluralize(league.errors.count, "error") + " prohibited this league from being saved:"
+      ul
+        - league.errors.full_messages.each do |message|
+          li = message
+
+  .form-group
+    = form.label :name
+    = form.text_field :name, class: 'form-control', placeholder: 'Enter league name'
+
+  .form-group
+    = form.label :country
+    = form.text_field :country, class: 'form-control', placeholder: 'Enter country'
+
+  .form-group
+    = form.label :logo
+    = form.file_field :logo, class: 'form-control-file'
+
+  .actions
+    = form.submit 'Save', class: 'btn btn-primary'
+    = link_to 'Back', leagues_path, class: 'btn btn-secondary'

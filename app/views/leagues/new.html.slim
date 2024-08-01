@@ -1,0 +1,18 @@
+h1 = "#{action_name.capitalize} League"
+
+= form_with model: @league, local: true, html: { multipart: true } do |form|
+  .form-group
+    = form.label :name
+    = form.text_field :name, class: 'form-control'
+
+  .form-group
+    = form.label :city
+    = form.text_field :city, class: 'form-control'
+
+  .form-group
+    = form.label :logo
+    = form.file_field :logo, class: 'form-control'
+
+  .form-group
+    = form.submit class: 'btn btn-primary'
+    = link_to 'Back', leagues_path, class: 'btn btn-secondary'

@@ -1,0 +1,58 @@
+div id=dom_id(@league) class="text-center"
+  h1 League Details
+
+  p
+    strong Name:
+    = @league.name
+
+  p
+    strong Country:
+    = @league.country
+
+  - if @league.logo.attached?
+    p
+      strong Logo:
+      br
+      = image_tag @league.logo, style: 'max-width: 200px;'
+
+  .btn-group(role="group")
+    = link_to 'Edit', edit_league_path(@league), class: 'btn btn-primary'
+    = link_to 'Destroy', @league, method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger'
+    = link_to 'Back to Leagues', leagues_path, class: 'btn btn-secondary'
+    = link_to 'Show on Map', '#', id: 'show-league-map', class: 'btn btn-info'
+
+  br
+
+  #league-map(style="height: 500px; width: 100%; display: none;" data-teams=@league.teams.to_json(only: [:lat, :lng, :name, :logo], methods: [:logo_url]))
+
+  br
+
+  h2 Teams in this League
+
+  - if @league.teams.any?
+    table.table
+      thead
+        tr
+          th Name
+          th Country
+          th City
+          th Logo
+          th Actions
+      tbody
+        - @league.teams.each do |team|
+          tr
+            td = team.name
+            td = team.location
+            td = team.city
+            td
+              - if team.logo.attached?
+                = image_tag team.logo, style: 'max-width: 100px;'
+              - else
+                | No logo
+            td = link_to 'Show', team_path(team), class: 'btn btn-sm btn-secondary'
+
+  - else
+    p No teams in this league.
+
+  p
+    = debug @league.teams

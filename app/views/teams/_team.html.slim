@@ -1,0 +1,21 @@
+#= dom_id team, class: 'text-center'
+  p
+    strong Name:
+    = team.name
+
+  p
+    strong Location:
+    = team.location
+
+  p
+    strong Year:
+    = team.year
+
+  p
+    strong League:
+    = team.league.name
+
+  - if team.logo.attached?
+    p
+      strong Logo:
+      = image_tag team.logo

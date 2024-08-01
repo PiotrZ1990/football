@@ -1,0 +1,13 @@
+#= dom_id league
+  p
+    strong Name:
+    = league.name
+
+  p
+    strong Country:
+    = league.country
+
+  - if league.logo.attached?
+    p
+      strong Logo:
+      = image_tag league.logo

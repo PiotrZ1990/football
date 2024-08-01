@@ -1,0 +1,28 @@
+.container.text-center
+  nav.mb-4
+    = link_to 'New League', new_league_path, class: 'btn btn-primary'
+
+  h1 Leagues
+
+  table.table.table-striped
+    thead
+      tr
+        th Name
+        th Country
+        th Logo
+        th Actions
+
+    tbody
+      - @leagues.each do |league|
+        tr
+          td = league.name
+          td = league.country
+          td
+            - if league.logo.attached?
+              = image_tag league.logo, style: "max-width: 100px;"
+            - else
+              No logo
+          td
+            = link_to 'Show', league, class: 'btn btn-secondary'
+            = link_to 'Edit', edit_league_path(league), class: 'btn btn-primary'
+            = link_to 'Destroy', league, method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger'
