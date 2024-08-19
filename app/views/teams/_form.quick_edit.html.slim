@@ -1,0 +1,15 @@
+= form_with(model: team, url: url, method: method, local: false) do |form|
+  .field
+    = form.label :name
+    = form.text_field :name
+
+  .field
+    = form.label :city
+    = form.text_field :city
+
+  .field
+    = form.label :logo
+    = form.file_field :logo
+
+  .actions
+    = form.submit 'Update'
