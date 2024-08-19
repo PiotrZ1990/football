@@ -16,7 +16,7 @@
 
     tbody
       - @teams.each do |team|
-        tr id="team_#{team.id}"
+        tr
           td = team.name
           td = team.league.name
           td = team.location
@@ -32,7 +32,3 @@
             = link_to 'Show', team, class: 'btn btn-secondary'
             = link_to 'Edit', edit_team_path(team), class: 'btn btn-primary'
             = link_to 'Destroy', team, method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger'
-            = link_to 'Quick Edit', quick_edit_team_path(team), class: 'btn btn-warning', data: { turbo_frame: "team_#{team.id}_edit" }
-
-        = turbo_frame_tag "team_#{team.id}_edit" do
-          = render partial: 'form.quick_edit', locals: { team: team, url: quick_update_team_path(team), method: :patch }

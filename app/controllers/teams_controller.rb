@@ -1,5 +1,5 @@
 class TeamsController < ApplicationController
-  before_action :set_team, only: %i[show edit update destroy history quick_edit quick_update]
+  before_action :set_team, only: %i[show edit update destroy history]
 
   # GET /teams
   def index
@@ -57,30 +57,6 @@ class TeamsController < ApplicationController
       redirect_to @team, notice: 'Team was successfully updated.'
     else
       render :edit
-    end
-  end
-
-  # GET /teams/1/quick_edit
-  def quick_edit
-  respond_to do |format|
-    format.html { render partial: 'teams/form.quick_edit', locals: { team: @team, url: quick_update_team_path(@team), method: :patch } }
-    format.turbo_stream
-  end
-end
-
-
-  # PATCH/PUT /teams/1/quick_update
-  def quick_update
-    if @team.update(team_params)
-      respond_to do |format|
-        format.html { redirect_to @team, notice: 'Team was successfully updated.' }
-        format.turbo_stream { render turbo_stream: turbo_stream.replace("team_#{@team.id}", partial: "teams/team", locals: { team: @team }) }
-      end
-    else
-      respond_to do |format|
-        format.html { render :edit }
-        format.turbo_stream { render turbo_stream: turbo_stream.replace("team_#{@team.id}_edit", partial: "teams/form.quick_edit", locals: { team: @team, url: quick_update_team_path(@team), method: :patch }) }
-      end
     end
   end
 

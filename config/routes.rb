@@ -6,8 +6,6 @@ Rails.application.routes.draw do
   resources :teams do
     member do
       get 'history'
-      get :quick_edit
-      patch :quick_update
     end
   end
 
