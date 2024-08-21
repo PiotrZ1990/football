@@ -14,15 +14,18 @@
 
     tbody
       - @leagues.each do |league|
-        tr
-          td = league.name
-          td = league.country
-          td
-            - if league.logo.attached?
-              = image_tag league.logo, style: "max-width: 100px;"
-            - else
-              No logo
-          td
-            = link_to 'Show', league, class: 'btn btn-secondary'
-            = link_to 'Edit', edit_league_path(league), class: 'btn btn-primary'
-            = link_to 'Destroy', league, method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger'
+        - frame_id = dom_id(league, "row_turbo_frame")
+        = turbo_frame_tag frame_id do
+          tr
+            td = league.name
+            td = league.country
+            td
+              - if league.logo.attached?
+                = image_tag league.logo, style: "max-width: 100px;"
+              - else
+                | No logo
+
+            td
+              = link_to 'Show', league, class: 'btn btn-secondary'
+              = link_to 'Edit', edit_league_path(league), class: 'btn btn-primary'
+              = link_to 'Destroy', league, method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger'

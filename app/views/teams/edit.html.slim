@@ -1,28 +1,30 @@
 h1 = "#{action_name.capitalize} Team"
 
-= form_with model: @team, local: true, html: { multipart: true } do |form|
-  .form-group
-    = form.label :name
-    = form.text_field :name, class: 'form-control'
+- frame_id = dom_id(@team, "form_turbo_frame")
+= turbo_frame_tag frame_id do
+  = form_with model: @team, local: true, html: { multipart: true } do |form|
+    .form-group
+      = form.label :name
+      = form.text_field :name, class: 'form-control'
 
-  .form-group
-    = form.label :city
-    = form.text_field :city, class: 'form-control'
+    .form-group
+      = form.label :city
+      = form.text_field :city, class: 'form-control'
 
-  .form-group
-    = form.label :logo
-    = form.file_field :logo, class: 'form-control'
+    .form-group
+      = form.label :logo
+      = form.file_field :logo, class: 'form-control'
 
-  .form-group
-    = form.label :lat, 'Latitude'
-    = form.text_field :lat, class: 'form-control'
+    .form-group
+      = form.label :lat, 'Latitude'
+      = form.text_field :lat, class: 'form-control'
 
-  .form-group
-    = form.label :lng, 'Longitude'
-    = form.text_field :lng, class: 'form-control'
+    .form-group
+      = form.label :lng, 'Longitude'
+      = form.text_field :lng, class: 'form-control'
 
-  br
+    br
 
-  .form-group
-    = form.submit class: 'btn btn-primary'
-    = link_to 'Back', teams_path, class: 'btn btn-secondary'
+    .form-group
+      = form.submit class: 'btn btn-primary'
+      = link_to 'Back', teams_path, class: 'btn btn-secondary'

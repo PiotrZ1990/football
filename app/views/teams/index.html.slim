@@ -16,19 +16,22 @@
 
     tbody
       - @teams.each do |team|
-        tr
-          td = team.name
-          td = team.league.name
-          td = team.location
-          td = team.city
+        - frame_id = dom_id(team, "row_turbo_frame")
+        = turbo_frame_tag frame_id do
+          tr
+            td 
+              = team.name
+            td = team.league.name
+            td = team.location
+            td = team.city
 
-          td
-            - if team.logo.attached?
-              = image_tag team.logo, style: 'max-width: 100px;'
-            - else
-              | No logo
+            td
+              - if team.logo.attached?
+                = image_tag team.logo, style: 'max-width: 100px;'
+              - else
+                | No logo
 
-          td
-            = link_to 'Show', team, class: 'btn btn-secondary'
-            = link_to 'Edit', edit_team_path(team), class: 'btn btn-primary'
-            = link_to 'Destroy', team, method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger'
+            td
+              = link_to 'Show', team, class: 'btn btn-secondary'
+              = link_to 'Edit', edit_team_path(team), class: 'btn btn-primary'
+              = link_to 'Destroy', team, method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger'
