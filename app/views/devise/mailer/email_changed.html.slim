@@ -1,0 +1,22 @@
+.container.text-center
+  h2.mb-4 Hello!
+
+  p.mb-4
+    | Hello 
+    = @email
+    | !
+
+  - if @resource.try(:unconfirmed_email?)
+    p.mb-4
+      | We're contacting you to notify you that your email is being changed to 
+      = @resource.unconfirmed_email
+      | .
+
+  - else
+    p.mb-4
+      | We're contacting you to notify you that your email has been changed to 
+      = @resource.email
+      | .
+
+  p.mt-4
+    = link_to 'Back to login', new_user_session_path, class: 'btn btn-secondary'

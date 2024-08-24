@@ -1,0 +1,27 @@
+.container.text-center
+  nav.mb-4
+
+  h1 Matches
+
+  table.table.table-striped
+    thead
+      tr
+        th Home Team
+        th Away Team
+        th Date
+        th Address
+        th City
+        th Actions
+    tbody
+      - @matches.each do |match|
+        - frame_id = dom_id(match, "row_turbo_frame")
+        = turbo_frame_tag frame_id do
+          tr
+            td = match.home_team.name
+            td = match.away_team.name
+            td = match.date
+            td = match.home_team.address
+            td = match.home_team.city
+
+            td
+              = link_to 'Show', match, class: 'btn btn-secondary'

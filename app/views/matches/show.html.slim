@@ -1,0 +1,22 @@
+.container.text-center
+  h1 = "#{@match.home_team.name} vs #{@match.away_team.name}"
+
+  .my-4
+    p
+      | Date: 
+      = @match.date
+
+    p
+      | City: 
+      = @match.home_team.city
+    br
+    p
+      | Address: 
+      = @match.home_team.address
+
+  - if user_signed_in?
+    - ticket = @match.tickets.find_by(user: current_user)
+    - if ticket
+      = link_to 'Download Ticket', match_ticket_path(@match, ticket, format: :pdf), class: 'btn btn-primary'
+    - else
+      = button_to 'Buy Ticket', match_tickets_path(@match), method: :post, class: 'btn btn-primary'

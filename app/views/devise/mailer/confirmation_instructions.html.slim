@@ -1,0 +1,13 @@
+.container.text-center
+  h2.mb-4 Welcome!
+
+  p.mb-4
+    | Welcome 
+    = @email
+    | !
+    
+  p.mb-4
+    | You can confirm your account email through the link below:
+
+  p
+    = link_to 'Confirm my account', confirmation_url(@resource, confirmation_token: @token), class: 'btn btn-primary'
