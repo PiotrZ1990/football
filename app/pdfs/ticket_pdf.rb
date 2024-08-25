@@ -1,3 +1,6 @@
+require 'open-uri'
+require 'mini_magick'
+
 class TicketPdf < Prawn::Document
   def initialize(ticket, base_url)
     super()
@@ -14,7 +17,45 @@ class TicketPdf < Prawn::Document
   end
 
   def text_content
-    text "Match: #{@ticket.match.home_team.name} vs #{@ticket.match.away_team.name}", size: 20
+    # Define positions for logos and text
+    home_team_x = 20
+    away_team_x = 270
+
+    bounding_box([0, cursor], width: bounds.width) do
+      # Add home team logo and name
+      if @ticket.match.home_team.logo.attached?
+        io = @ticket.match.home_team.logo.download
+        file = Tempfile.new(["home_logo", ".png"], binmode: true)
+        file.write(io)
+        file.rewind
+        image file.path, at: [home_team_x, cursor], width: 50 # Adjust as needed
+        file.close
+        file.unlink
+      end
+
+      # Adjust position for text box to be aligned with the logo
+      draw_text "#{@ticket.match.home_team.name}", size: 20, at: [home_team_x + 60, cursor - 20] # Adjust position to raise name
+
+      # Add away team logo and name
+      if @ticket.match.away_team.logo.attached?
+        io = @ticket.match.away_team.logo.download
+        file = Tempfile.new(["away_logo", ".png"], binmode: true)
+        file.write(io)
+        file.rewind
+        image file.path, at: [away_team_x, cursor], width: 50 # Adjust as needed
+        file.close
+        file.unlink
+      end
+
+      # Adjust position for text box to be aligned with the logo
+      draw_text "#{@ticket.match.away_team.name}", size: 20, at: [away_team_x + 60, cursor - 20] # Adjust position to raise name
+
+      move_down 60 # Create space below the match details for the rest of the content
+    end
+
+    move_down 40
+
+    # Additional details below the match details
     text "Date: #{@ticket.match.date}", size: 20
     text "City: #{@ticket.match.home_team.city}", size: 20
     text "Address: #{@ticket.match.home_team.address}", size: 20
@@ -30,8 +71,7 @@ class TicketPdf < Prawn::Document
 
   def print_qr_code(qr)
     require 'rqrcode'
-    # Konwertowanie QRCode do obrazu
     png = qr.as_png(size: 200)
-    image StringIO.new(png.to_s), at: [50, 450], width: 150
+    image StringIO.new(png.to_s), at: [50, cursor - 50], width: 150
   end
 end
