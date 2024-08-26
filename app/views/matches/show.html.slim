@@ -20,3 +20,11 @@
       = link_to 'Download Ticket', match_ticket_path(@match, ticket, format: :pdf), class: 'btn btn-primary'
     - else
       = button_to 'Buy Ticket', match_tickets_path(@match), method: :post, class: 'btn btn-primary'
+  - else
+    = button_to 'Buy Ticket', new_user_session_path, method: :get, class: 'btn btn-primary'
+
+  h2.mt-5 Users Who Bought Tickets
+  ul.list-group.mt-3
+    - @match.tickets.each do |ticket|
+      li.list-group-item
+        = ticket.user.email
