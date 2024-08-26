@@ -58,6 +58,7 @@ gem 'reline'
 gem 'devise'
 gem 'prawn'
 gem 'rqrcode'
+gem 'cancancan', '~> 3.0'
 
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
