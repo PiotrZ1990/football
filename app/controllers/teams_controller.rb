@@ -8,6 +8,13 @@ class TeamsController < ApplicationController
 
   # GET /teams/1
   def show
+    # Przygotowanie danych dla wykresów
+    @match_statistics = {
+      'Win' => @team.home_matches.where("home_score > away_score").count + @team.away_matches.where("away_score > home_score").count,
+      'Loss' => @team.home_matches.where("home_score < away_score").count + @team.away_matches.where("away_score > home_score").count,
+      'Draw' => @team.home_matches.where("home_score = away_score").count + @team.away_matches.where("home_score = away_score").count
+    }
+  
   end
 
   # GET /teams/1/history
@@ -20,7 +27,7 @@ class TeamsController < ApplicationController
       @league_teams = league_teams.map { |team| team_details(team) }.sort_by { |team| -team[:points] }
 
       respond_to do |format|
-        # format.html # Jeśli używasz HTML, upewnij się, że odpowiedni widok istnieje
+        format.html # Jeśli używasz HTML, upewnij się, że odpowiedni widok istnieje
         format.json { render json: { matches: @match_details, league_teams: @league_teams } }
       end
     else
@@ -115,5 +122,27 @@ class TeamsController < ApplicationController
       wins: wins,
       points: points
     }
+  end
+
+  def points_for_match(match)
+    if match.home_team_id == @team.id
+      if match.home_score > match.away_score
+        3
+      elsif match.home_score == match.away_score
+        1
+      else
+        0
+      end
+    elsif match.away_team_id == @team.id
+      if match.away_score > match.home_score
+        3
+      elsif match.away_score == match.home_score
+        1
+      else
+        0
+      end
+    else
+      0
+    end
   end
 end
