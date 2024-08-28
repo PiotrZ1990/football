@@ -1,5 +1,14 @@
 .container.text-center
-  h1 = "#{@match.home_team.name} vs #{@match.away_team.name}"
+  h1
+    - if @match.home_team.logo.attached?
+      = image_tag @match.home_team.logo, style: 'max-width: 50px; vertical-align: middle; margin-right: 10px;'
+    = "#{@match.home_team.name} "
+    
+    | vs 
+    
+    - if @match.away_team.logo.attached?
+      = image_tag @match.away_team.logo, style: 'max-width: 50px; vertical-align: middle; margin-left: 10px;'
+    = "#{@match.away_team.name}"
 
   .my-4
     p
@@ -13,6 +22,10 @@
     p
       | Address: 
       = @match.home_team.address
+
+    p
+      | Score: 
+      = "#{@match.home_score} - #{@match.away_score}"
 
   - if user_signed_in?
     - ticket = @match.tickets.find_by(user: current_user)
