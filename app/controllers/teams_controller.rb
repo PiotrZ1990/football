@@ -14,6 +14,11 @@ class TeamsController < ApplicationController
       'Loss' => @team.home_matches.where("home_score < away_score").count + @team.away_matches.where("away_score > home_score").count,
       'Draw' => @team.home_matches.where("home_score = away_score").count + @team.away_matches.where("home_score = away_score").count
     }
+
+    @goals_statistics = {
+    "Goals Scored" => @team.home_matches.sum(:home_score) + @team.away_matches.sum(:away_score),
+    "Goals Conceded" => @team.home_matches.sum(:away_score) + @team.away_matches.sum(:home_score)
+    }
   
   end
 

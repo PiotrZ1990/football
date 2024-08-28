@@ -64,7 +64,15 @@ div id=dom_id(@team) class="text-center"
                 th Wins
                 th Points
             tbody
+    br
 
-    .col-md-4
-      h2 Match Statistics
-      = pie_chart @match_statistics, title: "Matches Outcomes"
+    .container.charts-container
+      .col-md-4
+        h2 Match Statistics 
+        = pie_chart @match_statistics, title: "Matches Outcomes"
+
+      .col-md-4
+        h2 Goals Statistics
+        = bar_chart @goals_statistics, title: "Goals"
+
+   

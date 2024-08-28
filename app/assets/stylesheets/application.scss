@@ -103,3 +103,14 @@ table.table tbody tr {
 table tbody tr {
   transition: opacity 1s;
 }
+
+.charts-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.chart {
+  flex: 1 1 25%; /* Ustawia szerokość kolumny na 25% */
+  margin: 10px; /* Dodaje margines między kolumnami */
+}
