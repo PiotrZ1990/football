@@ -67,12 +67,18 @@ div id=dom_id(@team) class="text-center"
     br
 
     .container.charts-container
-      .col-md-4
-        h2 Match Statistics 
-        = pie_chart @match_statistics, title: "Matches Outcomes"
+        .col-md-4
+          h2 Match Statistics 
+          = pie_chart @match_statistics, title: "Matches Outcomes"
 
-      .col-md-4
-        h2 Goals Statistics
-        = bar_chart @goals_statistics, title: "Goals"
+        .col-md-4
+          h2 Goals Statistics
+          = bar_chart @goals_statistics, title: "Goals"
+
+        .col-md-4
+          h2 Streak
+          = line_chart @points_over_time, title: "Points", xtitle: "Date", ytitle: "Points"
+
+
 
    

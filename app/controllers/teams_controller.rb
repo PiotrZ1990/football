@@ -16,10 +16,18 @@ class TeamsController < ApplicationController
     }
 
     @goals_statistics = {
-    "Goals Scored" => @team.home_matches.sum(:home_score) + @team.away_matches.sum(:away_score),
-    "Goals Conceded" => @team.home_matches.sum(:away_score) + @team.away_matches.sum(:home_score)
+      "Goals Scored" => @team.home_matches.sum(:home_score) + @team.away_matches.sum(:away_score),
+      "Goals Conceded" => @team.home_matches.sum(:away_score) + @team.away_matches.sum(:home_score)
     }
-  
+
+    @points_over_time = @team.home_matches.or(@team.away_matches).order(:date).map do |match|
+      [match.date.strftime('%Y-%m-%d'), points_for_match(match, @team)]
+    end
+
+  @points_over_time = [
+    { name: 'Points Over Time', data: @points_over_time }
+  ]
+
   end
 
   # GET /teams/1/history
@@ -129,8 +137,21 @@ class TeamsController < ApplicationController
     }
   end
 
-  def points_for_match(match)
-    if match.home_team_id == @team.id
+   def calculate_points_over_time(team)
+    total_points = 0
+    matches = team.home_matches.or(team.away_matches).order(:date)
+    points_over_time = matches.map do |match|
+      total_points += points_for_match(match, team)
+      {
+        date: match.date.strftime('%Y-%m-%d'),
+        points: total_points
+      }
+    end
+    points_over_time
+  end
+
+  def points_for_match(match, team)
+    if match.home_team_id == team.id
       if match.home_score > match.away_score
         3
       elsif match.home_score == match.away_score
@@ -138,7 +159,7 @@ class TeamsController < ApplicationController
       else
         0
       end
-    elsif match.away_team_id == @team.id
+    elsif match.away_team_id == team.id
       if match.away_score > match.home_score
         3
       elsif match.away_score == match.home_score
