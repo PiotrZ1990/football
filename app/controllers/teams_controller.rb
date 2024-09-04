@@ -24,9 +24,15 @@ class TeamsController < ApplicationController
       [match.date.strftime('%Y-%m-%d'), points_for_match(match, @team)]
     end
 
-  @points_over_time = [
-    { name: 'Points Over Time', data: @points_over_time }
-  ]
+    @cumulative_points = calculate_cumulative_points(@team)
+
+    @points_over_time = [
+      { name: 'Points Over Time', data: @points_over_time }
+    ]
+
+    @cumulative_points = [
+      { name: 'Cumulative Points', data: @cumulative_points }
+    ]
 
   end
 
@@ -149,6 +155,16 @@ class TeamsController < ApplicationController
     end
     points_over_time
   end
+
+  def calculate_cumulative_points(team)
+  total_points = 0
+  matches = team.home_matches.or(team.away_matches).order(:date)
+  matches.map do |match|
+    total_points += points_for_match(match, team)
+    [match.date.strftime('%Y-%m-%d'), total_points]
+  end
+end
+
 
   def points_for_match(match, team)
     if match.home_team_id == team.id
