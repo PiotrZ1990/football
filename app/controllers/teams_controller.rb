@@ -1,6 +1,6 @@
 class TeamsController < ApplicationController
   before_action :set_team, only: %i[show edit update destroy history]
-
+  
   # GET /teams
   def index
     @teams = Team.all
@@ -33,7 +33,6 @@ class TeamsController < ApplicationController
     @cumulative_points = [
       { name: 'Cumulative Points', data: @cumulative_points }
     ]
-
   end
 
   # GET /teams/1/history
@@ -92,6 +91,41 @@ class TeamsController < ApplicationController
     redirect_to teams_url, notice: 'Team was successfully destroyed.'
   end
 
+  # GET /teams/export_all_to_excel
+  def export_all_to_excel
+    workbook = Axlsx::Package.new
+    
+    # Dodaj arkusz dla każdej ligi
+    League.find_each do |league|
+      workbook.workbook.add_worksheet(name: league.name) do |sheet|
+        # Nagłówki
+        sheet.add_row ["Team Name", "City", "Matches Played", "Goals Scored", "Goals Conceded", "Points", "Logo URL",]
+
+        # Dodaj dane drużyn w danej lidze
+        league.teams.each do |team|
+          matches_played = team.home_matches.count + team.away_matches.count
+          goals_scored = team.home_matches.sum(:home_score) + team.away_matches.sum(:away_score)
+          goals_conceded = team.home_matches.sum(:away_score) + team.away_matches.sum(:home_score)
+          points = (team.home_matches.where('home_score > away_score').count + team.away_matches.where('away_score > home_score').count) * 3 +
+                   team.home_matches.where('home_score = away_score').count + team.away_matches.where('home_score = away_score').count
+
+          sheet.add_row [
+            team.name,
+            team.city,
+            matches_played,
+            goals_scored,
+            goals_conceded,
+            points,
+            team.logo.attached? ? url_for(team.logo) : 'No Logo',
+          ]
+        end
+      end
+    end
+
+    # Zapisz plik do wysłania
+    send_data workbook.to_stream.read, filename: "teams_report.xlsx", type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  end
+
   private
 
   def set_team
@@ -143,7 +177,7 @@ class TeamsController < ApplicationController
     }
   end
 
-   def calculate_points_over_time(team)
+  def calculate_points_over_time(team)
     total_points = 0
     matches = team.home_matches.or(team.away_matches).order(:date)
     points_over_time = matches.map do |match|
@@ -157,14 +191,13 @@ class TeamsController < ApplicationController
   end
 
   def calculate_cumulative_points(team)
-  total_points = 0
-  matches = team.home_matches.or(team.away_matches).order(:date)
-  matches.map do |match|
-    total_points += points_for_match(match, team)
-    [match.date.strftime('%Y-%m-%d'), total_points]
+    total_points = 0
+    matches = team.home_matches.or(team.away_matches).order(:date)
+    matches.map do |match|
+      total_points += points_for_match(match, team)
+      [match.date.strftime('%Y-%m-%d'), total_points]
+    end
   end
-end
-
 
   def points_for_match(match, team)
     if match.home_team_id == team.id

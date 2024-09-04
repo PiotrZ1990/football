@@ -61,6 +61,8 @@ gem 'rqrcode'
 gem 'cancancan', '~> 3.0'
 gem 'chartkick'
 gem 'groupdate'
+gem 'axlsx'
+gem 'axlsx_rails'
 
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
