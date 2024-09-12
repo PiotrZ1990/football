@@ -4,6 +4,7 @@ Rails.application.routes.draw do
 
   resources :leagues do
     get 'rankings', to: 'teams#league_rankings'
+    post 'compare_teams', on: :member
   end
 
   resources :teams do

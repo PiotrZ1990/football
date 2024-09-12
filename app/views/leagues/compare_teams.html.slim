@@ -1,0 +1,27 @@
+h1 Compare Teams
+
+- if @team_stats.any?
+  table.table.table-striped
+    thead
+      tr
+        th Name
+        th Matches
+        th Wins
+        th Losses
+        th Draws
+        th Points
+        th Goals Scored
+        th Goals Conceded
+    tbody
+      - @team_stats.each do |stats|
+        tr
+          td = stats[:team].name
+          td = stats[:matches]
+          td = stats[:wins]
+          td = stats[:losses]
+          td = stats[:draws]
+          td = stats[:points]
+          td = stats[:goals_scored]
+          td = stats[:goals_conceded]
+- else
+  p No teams selected for comparison.

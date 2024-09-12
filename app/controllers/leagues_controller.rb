@@ -1,7 +1,7 @@
 require 'chunky_png'
 
 class LeaguesController < ApplicationController
-  before_action :set_league, only: %i[show edit update destroy]
+  before_action :set_league, only: %i[show edit update destroy compare_teams]
 
   # GET /leagues
   # GET /leagues.json
@@ -42,7 +42,6 @@ class LeaguesController < ApplicationController
   end
 
   # PATCH/PUT /leagues/1
-  # PATCH/PUT /leagues/1.json
   def update
     respond_to do |format|
       if @league.update(league_params)
@@ -56,7 +55,6 @@ class LeaguesController < ApplicationController
   end
 
   # DELETE /leagues/1
-  # DELETE /leagues/1.json
   def destroy
     @league.destroy
 
@@ -65,6 +63,32 @@ class LeaguesController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+  def compare_teams
+  if params[:team_ids].present?
+    @teams = Team.where(id: params[:team_ids])
+    
+    @team_stats = @teams.map do |team|
+      {
+        team: team,
+        matches: team.matches.count,
+        wins: team.matches.where(result: 'win').count,
+        losses: team.matches.where(result: 'loss').count,
+        draws: team.matches.where(result: 'draw').count,
+        points: team.points,
+        goals_scored: team.goals_scored,
+        goals_conceded: team.goals_conceded
+      }
+    end
+
+    # Zwraca JSON z URL przekierowania
+    render json: { redirect_url: compare_teams_league_path(@league) }
+  else
+    flash[:alert] = "Please select at least one team to compare."
+    render json: { error: 'No teams selected' }, status: :unprocessable_entity
+  end
+end
+
 
   private
 
