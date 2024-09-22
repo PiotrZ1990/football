@@ -71,23 +71,24 @@ class LeaguesController < ApplicationController
     @team_stats = @teams.map do |team|
       {
         team: team,
-        matches: team.matches.count,
-        wins: team.matches.where(result: 'win').count,
-        losses: team.matches.where(result: 'loss').count,
-        draws: team.matches.where(result: 'draw').count,
+        matches: team.all_matches.count,
+        wins: team.all_matches.where(result: 'W').count,
+        losses: team.all_matches.where(result: 'L').count,
+        draws: team.all_matches.where(result: 'D').count,
         points: team.points,
         goals_scored: team.goals_scored,
         goals_conceded: team.goals_conceded
       }
     end
 
-    # Zwraca JSON z URL przekierowania
-    render json: { redirect_url: compare_teams_league_path(@league) }
+    render :compare_teams
   else
-    flash[:alert] = "Please select at least one team to compare."
-    render json: { error: 'No teams selected' }, status: :unprocessable_entity
+    redirect_to league_path(params[:league_id]), alert: 'No teams selected for comparison.'
   end
 end
+
+
+
 
 
   private

@@ -22,4 +22,34 @@ class Team < ApplicationRecord
   rescue StandardError => e
     Rails.logger.error("Geocoding failed for address #{address}: #{e.message}")
   end
+
+  def points
+  wins_count = all_matches.where(result: 'W').count
+  draws_count = all_matches.where(result: 'D').count
+  (wins_count * 3) + (draws_count * 1)
+  end
+
+  def wins
+    all_matches.where(result: 'win').count
+  end
+
+  def losses
+    all_matches.where(result: 'loss').count
+  end
+
+  def draws
+    all_matches.where(result: 'draw').count
+  end
+
+  def goals_scored
+    home_matches.sum(:home_score) + away_matches.sum(:away_score)
+  end
+
+  def goals_conceded
+    home_matches.sum(:away_score) + away_matches.sum(:home_score)
+  end
+
+  def all_matches
+    Match.where(home_team: self).or(Match.where(away_team: self))
+  end
 end
