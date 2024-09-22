@@ -1,9 +1,18 @@
 h1 Compare Teams
 
-- if @team_stats.any?
-  // Debugowanie
-  pre= @team_stats.inspect
+.container.charts-container
+  .chart
+    h2 Points Over Time
+    = line_chart @points_over_time, title: "Points", xtitle: "Date", ytitle: "Points", library: { lineSmooth: false }
 
+  .chart
+    h2 Cumulative Points
+    = line_chart @cumulative_points, title: "Cumulative Points", xtitle: "Date", ytitle: "Points", library: { lineSmooth: false }
+
+br
+h1 Tables
+
+- if @team_stats.any?
   table.table.table-striped
     thead
       tr
@@ -26,5 +35,6 @@ h1 Compare Teams
           td = stats[:points]
           td = stats[:goals_scored]
           td = stats[:goals_conceded]
+
 - else
   p No teams selected for comparison.

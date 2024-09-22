@@ -57,12 +57,13 @@ div id=dom_id(@league) class="text-center"
     p No teams in this league.
 
   / Modal for team comparison
+
   .modal.fade id="compareTeamsModal" tabindex="-1" role="dialog" aria-labelledby="compareTeamsModalLabel" aria-hidden="true"
     .modal-dialog(role="document")
       .modal-content
         .modal-header
           h5.modal-title id="compareTeamsModalLabel" Compare Teams
-          button.close type="button" data-bs-dismiss="modal" aria-label="Close"
+          button.close type="button" data-bs-dismiss="modal" aria-label="Close" class="ms-auto"
             span aria-hidden="true" &times;
         = form_tag compare_teams_league_path(@league), method: :post do
           .modal-body
@@ -71,7 +72,8 @@ div id=dom_id(@league) class="text-center"
               - @league.teams.each do |team|
                 .form-check
                   = check_box_tag 'team_ids[]', team.id, false, id: "team_#{team.id}"
-                  = label_tag "team_#{team.id}", team.name
+                  = label_tag "team_#{team.id}", team.name, class: 'form-check-label'
           .modal-footer
             = button_tag 'Close', type: 'button', class: 'btn btn-secondary', data: { bs_dismiss: 'modal' }
             = submit_tag 'Compare', class: 'btn btn-primary'
+

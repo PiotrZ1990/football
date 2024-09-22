@@ -23,6 +23,44 @@ class Team < ApplicationRecord
     Rails.logger.error("Geocoding failed for address #{address}: #{e.message}")
   end
 
+  def calculate_cumulative_points
+  points_accumulated = 0
+  cumulative_points = []
+
+  all_matches.order(:date).each do |match|
+    points_accumulated += points_for_match(match)
+    cumulative_points << [match.date.strftime('%Y-%m-%d'), points_accumulated]
+  end
+
+  cumulative_points
+end
+
+
+  def points_for_match(match)
+  if match.home_team_id == id
+    case match.result
+    when 'W'  # Wygrana jako gospodarz
+      3
+    when 'D'  # Remis
+      1
+    else
+      0  # Przegrana
+    end
+  elsif match.away_team_id == id
+    case match.result
+    when 'W'  # Wygrana jako gość
+      3
+    when 'D'  # Remis
+      1
+    else
+      0  # Przegrana
+    end
+  else
+    0  # Nie dotyczy tej drużyny
+  end
+end
+
+
   def points
   wins_count = all_matches.where(result: 'W').count
   draws_count = all_matches.where(result: 'D').count

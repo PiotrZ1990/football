@@ -65,30 +65,35 @@ class LeaguesController < ApplicationController
   end
 
   def compare_teams
-  if params[:team_ids].present?
-    @teams = Team.where(id: params[:team_ids])
-    
-    @team_stats = @teams.map do |team|
-      {
-        team: team,
-        matches: team.all_matches.count,
-        wins: team.all_matches.where(result: 'W').count,
-        losses: team.all_matches.where(result: 'L').count,
-        draws: team.all_matches.where(result: 'D').count,
-        points: team.points,
-        goals_scored: team.goals_scored,
-        goals_conceded: team.goals_conceded
-      }
+    if params[:team_ids].present?
+      @teams = Team.where(id: params[:team_ids])
+
+      @team_stats = @teams.map do |team|
+        {
+          team: team,
+          matches: team.all_matches.count,
+          wins: team.all_matches.where(result: 'W').count,
+          losses: team.all_matches.where(result: 'L').count,
+          draws: team.all_matches.where(result: 'D').count,
+          points: team.points,
+          goals_scored: team.goals_scored,
+          goals_conceded: team.goals_conceded,
+          points_over_time: team.home_matches.or(team.away_matches).order(:date).map do |match|
+            [match.date.strftime('%Y-%m-%d'), team.points_for_match(match)]
+          end,
+          cumulative_points: team.calculate_cumulative_points
+        }
+      end
+
+      # Przygotowanie danych do wykresów
+      @points_over_time = @team_stats.map { |stats| { name: stats[:team].name, data: stats[:points_over_time] } }
+      @cumulative_points = @team_stats.map { |stats| { name: stats[:team].name, data: stats[:cumulative_points] } }
+
+      render :compare_teams
+    else
+      redirect_to league_path(params[:league_id]), alert: 'No teams selected for comparison.'
     end
-
-    render :compare_teams
-  else
-    redirect_to league_path(params[:league_id]), alert: 'No teams selected for comparison.'
   end
-end
-
-
-
 
 
   private
