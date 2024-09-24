@@ -85,6 +85,27 @@ class LeaguesController < ApplicationController
         }
       end
 
+      # Zbierz wszystkie unikalne daty
+      all_dates = @team_stats.flat_map { |stats| stats[:points_over_time].map { |point| point[0] } }.uniq.sort
+
+      # Uzupełnij brakujące punkty w danych każdej drużyny dla "Points Over Time"
+      @team_stats.each do |stats|
+        points_over_time_data = stats[:points_over_time].to_h
+        complete_data = all_dates.map { |date| [date, points_over_time_data[date] || 0] }
+        stats[:points_over_time] = complete_data
+      end
+
+      # Uzupełnij brakujące punkty w danych każdej drużyny dla "Cumulative Points"
+      @team_stats.each do |stats|
+        cumulative_points_data = stats[:cumulative_points].to_h
+        cumulative_total = 0 # Zmienna śledząca sumę punktów
+        complete_cumulative_data = all_dates.map do |date|
+          cumulative_total += (cumulative_points_data[date] || 0)
+          [date, cumulative_total]
+        end
+        stats[:cumulative_points] = complete_cumulative_data
+      end
+
       # Przygotowanie danych do wykresów
       @points_over_time = @team_stats.map { |stats| { name: stats[:team].name, data: stats[:points_over_time] } }
       @cumulative_points = @team_stats.map { |stats| { name: stats[:team].name, data: stats[:cumulative_points] } }
@@ -94,6 +115,8 @@ class LeaguesController < ApplicationController
       redirect_to league_path(params[:league_id]), alert: 'No teams selected for comparison.'
     end
   end
+
+
 
 
   private
