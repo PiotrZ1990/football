@@ -3,11 +3,11 @@ h1 Compare Teams
 .container.charts-container
   .chart
     h2 Points Over Time
-    = line_chart @points_over_time, title: "Points", xtitle: "Date", ytitle: "Points", library: { lineSmooth: false }
+    = line_chart @points_over_time, title: "Points", xtitle: "Date", ytitle: "Points", points: false, library: { lineSmooth: false }
 
   .chart
     h2 Cumulative Points
-    = line_chart @cumulative_points, title: "Cumulative Points", xtitle: "Date", ytitle: "Points", library: { lineSmooth: false }
+    = line_chart @cumulative_points, title: "Cumulative Points", xtitle: "Date", ytitle: "Points", points: false, library: { lineSmooth: false }
 
 br
 h1 Tables
