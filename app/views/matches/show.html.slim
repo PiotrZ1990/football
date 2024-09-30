@@ -39,19 +39,20 @@
   p
 
   h2 "Predict Betting Odds"
-  = button_to 'Calculate Odds', match_path(@match, predict: true), method: :get, class: 'btn btn-primary'
+  = button_to 'Calculate Odds', predict_odds_match_path(@match, predict: true), method: :get, class: 'btn btn-primary'
 
   - if @odds
     .my-4
-      h3 "Predicted Betting Odds"
       p
-        strong "Home Team Odds: "
+        strong "Home Team Odds" : 
         = @odds[:home_odds]
       p
-        strong "Away Team Odds: "
+        strong "Away Team Odds" : 
         = @odds[:away_odds]
   - else
     p No odds calculated. Please try again.
+
+
 
   h2.mt-5 Users Who Bought Tickets
   ul.list-group.mt-3

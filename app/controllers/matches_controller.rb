@@ -8,15 +8,19 @@ class MatchesController < ApplicationController
   def show
     @match = Match.find(params[:id])
     @tickets = @match.tickets
-
+    @odds = nil
     # Dodanie przewidywania kursów
-    if params[:predict] = 
-      home_team = @match.home_team
-      away_team = @match.away_team
-      @home_prob = Match.poisson_probabilities(home_team, away_team)
-      @away_prob = Match.poisson_probabilities(away_team, home_team)
+    if params[:predict].present? 
       @odds = Match.predict_betting_odds_for_match(@match)
     end
+  end
+
+  def predict_odds
+    @match = Match.find(params[:id])
+    @odds = Match.predict_betting_odds_for_match(@match)
+    
+    # Renderuj widok show po obliczeniu kursów
+    render :show
   end
 
   def new
