@@ -23,6 +23,10 @@ class Team < ApplicationRecord
     Rails.logger.error("Geocoding failed for address #{address}: #{e.message}")
   end
 
+  def average_goals
+    (home_matches.sum(:home_score) + away_matches.sum(:away_score)).to_f / (home_matches.count + away_matches.count)
+  end
+
   def calculate_cumulative_points
   points_accumulated = 0
   cumulative_points = []
