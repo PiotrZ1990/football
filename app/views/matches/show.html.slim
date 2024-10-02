@@ -35,11 +35,19 @@
       = button_to 'Buy Ticket', match_tickets_path(@match), method: :post, class: 'btn btn-primary'
   - else
     = button_to 'Buy Ticket', new_user_session_path(return_to: request.fullpath), method: :get, class: 'btn btn-primary'
-  
+
   p
 
   h2 "Predict Betting Odds"
-  = button_to 'Calculate Odds', predict_odds_match_path(@match, predict: true), method: :get, class: 'btn btn-primary'
+
+  / Formularz do wybierania liczby meczów
+  = form_with url: predict_odds_match_path(@match), method: :get, local: true do
+    .form-group
+      label for="num_matches" Number of last matches:
+      = number_field_tag :num_matches, params[:num_matches] || 5, min: 1, class: 'form-control'
+
+    / Przycisk do przewidywania kursów
+    = submit_tag 'Calculate Odds', class: 'btn btn-primary mt-2'
 
   - if @odds
     .my-4
@@ -51,8 +59,6 @@
         = @odds[:away_odds]
   - else
     p No odds calculated. Please try again.
-
-
 
   h2.mt-5 Users Who Bought Tickets
   ul.list-group.mt-3

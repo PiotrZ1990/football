@@ -17,7 +17,8 @@ class MatchesController < ApplicationController
 
   def predict_odds
     @match = Match.find(params[:id])
-    @odds = Match.predict_betting_odds_for_match(@match)
+    last_n_matches = params[:num_matches].present? ? params[:num_matches].to_i : 5
+    @odds = Match.predict_betting_odds_for_match(@match, last_n_matches)
     
     # Renderuj widok show po obliczeniu kursów
     render :show
