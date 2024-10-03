@@ -7,7 +7,7 @@ class Match < ApplicationRecord
 
   after_save :update_elo_ratings
 
-  def self.elo_win_probabilities(home_team, away_team, last_n_matches = 5)
+  def self.elo_win_probabilities(home_team, away_team, last_n_matches = 32)
     # Use elo_rating directly from the team instances
     home_rating = home_team.elo_rating
     away_rating = away_team.elo_rating
@@ -21,7 +21,7 @@ class Match < ApplicationRecord
     }
   end
 
-  def self.poisson_probabilities(team, opponent, max_goals = 6, last_n_matches = 5)
+  def self.poisson_probabilities(team, opponent, max_goals = 6, last_n_matches = 32)
     # Pobierz średnie gole drużyny z ostatnich n meczów
     team_home_matches = team.home_matches.order(date: :desc).limit(last_n_matches)
     team_avg_goals = team_home_matches.average(:home_score) || 0
@@ -46,7 +46,7 @@ class Match < ApplicationRecord
     (1..n).reduce(1, :*)
   end
 
-  def self.win_probabilities(home_team, away_team, last_n_matches = 5)
+  def self.win_probabilities(home_team, away_team, last_n_matches = 32)
     home_probabilities = poisson_probabilities(home_team, away_team, last_n_matches)
     away_probabilities = poisson_probabilities(away_team, home_team, last_n_matches)
 
@@ -70,7 +70,7 @@ class Match < ApplicationRecord
   end
 
 
-  def self.predict_betting_odds_for_match(match, last_n_matches = 5)
+  def self.predict_betting_odds_for_match(match, last_n_matches = 32)
     home_team = match.home_team
     away_team = match.away_team
 
@@ -110,7 +110,7 @@ class Match < ApplicationRecord
     away_team.update(elo_rating: new_away_rating)
   end
 
-  def calculate_new_elo(team, opponent, team_score, opponent_score, last_n_matches = 5, k_factor = 32)
+  def calculate_new_elo(team, opponent, team_score, opponent_score, last_n_matches = 32, k_factor = 32)
     # Oblicz oczekiwany wynik na podstawie ostatnich n meczów
     opponent_elo_rating = opponent.matches.order(date: :desc).limit(last_n_matches).pluck(:elo_rating).first || opponent.elo_rating
     expected_score = 1.0 / (1 + 10 ** ((opponent_elo_rating - team.elo_rating) / 400.0))
