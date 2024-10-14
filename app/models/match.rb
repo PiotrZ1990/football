@@ -7,49 +7,36 @@ class Match < ApplicationRecord
 
   after_save :update_elo_ratings
 
-  def self.elo_win_probabilities(home_team, away_team, last_n_matches = 32)
-    # Use elo_rating directly from the team instances
-    home_rating = home_team.elo_rating
-    away_rating = away_team.elo_rating
-
-    expected_home_win = 1.0 / (1 + 10 ** ((away_rating - home_rating) / 400.0))
-    expected_away_win = 1.0 / (1 + 10 ** ((home_rating - away_rating) / 400.0))
-
-    {
-      home_win_probability: expected_home_win,
-      away_win_probability: expected_away_win
-    }
+  def self.elo_win_probabilities(home_team, away_team)
+    calculate_elo_probabilities(home_team.elo_rating, away_team.elo_rating)
   end
 
   def self.poisson_probabilities(team, opponent, max_goals = 6, last_n_matches = 32)
-    # Pobierz średnie gole drużyny z ostatnich n meczów
-    team_home_matches = team.home_matches.order(date: :desc).limit(last_n_matches)
-    team_avg_goals = team_home_matches.average(:home_score) || 0
-
-    # Pobierz średnie gole przeciwnika z ostatnich n meczów
-    opponent_away_matches = opponent.away_matches.order(date: :desc).limit(last_n_matches)
-    opponent_avg_goals = opponent_away_matches.average(:away_score) || 0
+    team_avg_goals = team.home_matches.order(date: :desc).limit(last_n_matches).average(:home_score) || 0
+    opponent_avg_goals = opponent.away_matches.order(date: :desc).limit(last_n_matches).average(:away_score) || 0
 
     return [] if team_avg_goals.zero? || opponent_avg_goals.zero?
 
     lambda = team_avg_goals * opponent_avg_goals
-    probabilities = (0..max_goals).map do |goals|
-      (Math.exp(-lambda) * (lambda ** goals)) / factorial(goals)
-    end
-
-    probabilities
+    (0..max_goals).map { |goals| poisson_probability(lambda, goals) }
   end
 
-  # Dodaj metodę do obliczania silni
+  def self.poisson_probability(lambda, goals)
+    (Math.exp(-lambda) * (lambda ** goals)) / factorial(goals)
+  end
+
   def self.factorial(n)
-    return 1 if n == 0
-    (1..n).reduce(1, :*)
+    (1..n).reduce(1, :*) || 1
   end
 
   def self.win_probabilities(home_team, away_team, last_n_matches = 32)
     home_probabilities = poisson_probabilities(home_team, away_team, last_n_matches)
     away_probabilities = poisson_probabilities(away_team, home_team, last_n_matches)
 
+    calculate_win_probabilities(home_probabilities, away_probabilities)
+  end
+
+  def self.calculate_win_probabilities(home_probabilities, away_probabilities)
     home_win_probability = 0
     away_win_probability = 0
 
@@ -69,62 +56,73 @@ class Match < ApplicationRecord
     }
   end
 
-
   def self.predict_betting_odds_for_match(match, last_n_matches = 32)
     home_team = match.home_team
     away_team = match.away_team
 
-    # Obliczanie prawdopodobieństwa Poissona z ostatnich n meczów
     poisson_probabilities = win_probabilities(home_team, away_team, last_n_matches)
+    elo_probabilities = elo_win_probabilities(home_team, away_team)
 
-    # Obliczanie prawdopodobieństwa Elo z ostatnich n meczów
-    elo_probabilities = elo_win_probabilities(home_team, away_team, last_n_matches)
+    average_odds(poisson_probabilities, elo_probabilities)
+  end
 
-    # Obliczanie średnich kursów
+  def self.average_odds(poisson_probabilities, elo_probabilities)
     average_home_win_probability = (poisson_probabilities[:home_win_probability] + elo_probabilities[:home_win_probability]) / 2
     average_away_win_probability = (poisson_probabilities[:away_win_probability] + elo_probabilities[:away_win_probability]) / 2
 
-    home_odds = average_home_win_probability.zero? ? 0 : (1.0 / average_home_win_probability)
-    away_odds = average_away_win_probability.zero? ? 0 : (1.0 / average_away_win_probability)
+    home_odds = probability_to_odds(average_home_win_probability)
+    away_odds = probability_to_odds(average_away_win_probability)
 
     {
-      home_odds: home_odds.round(2),
-      away_odds: away_odds.round(2),
-      average_home_odds: ((home_odds + (1.0 / poisson_probabilities[:home_win_probability])) / 2).round(2),
-      average_away_odds: ((away_odds + (1.0 / poisson_probabilities[:away_win_probability])) / 2).round(2)
+      home_odds: home_odds,
+      away_odds: away_odds,
+      average_home_odds: ((home_odds + probability_to_odds(poisson_probabilities[:home_win_probability])) / 2).round(2),
+      average_away_odds: ((away_odds + probability_to_odds(poisson_probabilities[:away_win_probability])) / 2).round(2)
     }
   end
 
+  def self.probability_to_odds(probability)
+    probability.zero? ? 0 : (1.0 / probability).round(2)
+  end
+
   def update_elo_ratings
-    return unless home_score && away_score # Upewnij się, że wynik meczu jest dostępny
+    return unless home_score && away_score
 
-    home_team = self.home_team
-    away_team = self.away_team
+    update_team_elo(self.home_team, self.away_team, self.home_score, self.away_score)
+  end
 
-    # Obliczanie nowego rankingu Elo dla drużyn na podstawie wyniku meczu
-    new_home_rating = calculate_new_elo(home_team, away_team, self.home_score, self.away_score)
-    new_away_rating = calculate_new_elo(away_team, home_team, self.away_score, self.home_score)
+  def update_team_elo(home_team, away_team, home_score, away_score)
+    new_home_rating = calculate_new_elo(home_team, away_team, home_score, away_score)
+    new_away_rating = calculate_new_elo(away_team, home_team, away_score, home_score)
 
-    # Aktualizacja Elo ratingów w bazie danych
     home_team.update(elo_rating: new_home_rating)
     away_team.update(elo_rating: new_away_rating)
   end
 
-  def calculate_new_elo(team, opponent, team_score, opponent_score, last_n_matches = 32, k_factor = 32)
-    # Oblicz oczekiwany wynik na podstawie ostatnich n meczów
-    opponent_elo_rating = opponent.matches.order(date: :desc).limit(last_n_matches).pluck(:elo_rating).first || opponent.elo_rating
-    expected_score = 1.0 / (1 + 10 ** ((opponent_elo_rating - team.elo_rating) / 400.0))
+  def calculate_new_elo(team, opponent, team_score, opponent_score, k_factor = 32)
+    expected_score = calculate_elo_probabilities(team.elo_rating, opponent.elo_rating)[:home_win_probability]
+    actual_score = actual_result(team_score, opponent_score)
 
-    # Oblicz rzeczywisty wynik
-    actual_score = if team_score > opponent_score
-                     1.0
-                   elsif team_score < opponent_score
-                     0.0
-                   else
-                     0.5
-                   end
-
-    # Zaktualizuj Elo
     team.elo_rating + k_factor * (actual_score - expected_score)
+  end
+
+  def actual_result(team_score, opponent_score)
+    if team_score > opponent_score
+      1.0
+    elsif team_score < opponent_score
+      0.0
+    else
+      0.5
+    end
+  end
+
+  def self.calculate_elo_probabilities(home_rating, away_rating)
+    expected_home_win = 1.0 / (1 + 10 ** ((away_rating - home_rating) / 400.0))
+    expected_away_win = 1.0 / (1 + 10 ** ((home_rating - away_rating) / 400.0))
+
+    {
+      home_win_probability: expected_home_win,
+      away_win_probability: expected_away_win
+    }
   end
 end

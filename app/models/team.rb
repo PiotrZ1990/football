@@ -12,6 +12,10 @@ class Team < ApplicationRecord
   geocoded_by :address
   after_validation :geocode, if: :will_save_change_to_address?
 
+  def matches
+    Match.where('home_team_id = ? OR away_team_id = ?', id, id)
+  end
+
   def logo_url
     Rails.application.routes.url_helpers.rails_blob_url(logo, only_path: true) if logo.attached?
   end

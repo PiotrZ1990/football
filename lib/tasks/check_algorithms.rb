@@ -1,5 +1,3 @@
-# lib/tasks/check_algorithms.rb
-
 def simulate_betting
   matches = Match.where("CAST(round_number AS INTEGER) BETWEEN ? AND ? AND league_id = ?", 6, 38, 1).order(:date)
 
@@ -29,65 +27,49 @@ def simulate_betting
     average_home_win_probability = (poisson_probabilities[:home_win_probability] + elo_probabilities[:home_win_probability]) / 2
     average_away_win_probability = (poisson_probabilities[:away_win_probability] + elo_probabilities[:away_win_probability]) / 2
 
-    winning_team = determine_winner(match)
+    # Pomijamy mecz, jeśli kursy są zbyt podobne, aby zachować spójność z poprzednią wersją
+    next if (poisson_probabilities[:home_win_probability] - poisson_probabilities[:away_win_probability]).abs < 0.29 ||
+            (elo_probabilities[:home_win_probability] - elo_probabilities[:away_win_probability]).abs < 0.29 ||
+            (average_home_win_probability - average_away_win_probability).abs < 0.29
 
-    # Ustalamy, na którą drużynę stawiamy i wypisujemy szczegóły
-    # Poisson
-    if poisson_probabilities[:home_win_probability] > poisson_probabilities[:away_win_probability]
-      chosen_team = match.home_team.name
-      odds = 1 / poisson_probabilities[:home_win_probability]
-      total_profit[:poisson] += calculate_profit(match, :home, odds, 100)
-      successful_bets[:poisson] += 1 if winning_team == chosen_team
-    else
-      chosen_team = match.away_team.name
-      odds = 1 / poisson_probabilities[:away_win_probability]
-      total_profit[:poisson] += calculate_profit(match, :away, odds, 100)
-      successful_bets[:poisson] += 1 if winning_team == chosen_team
-    end
-    puts "W Poisson stawiam na #{chosen_team} z kursem #{odds.round(2)}"
+    # Logika dla modelu Poissona
+    total_profit[:poisson] += process_bet(poisson_probabilities, match, successful_bets, :poisson)
 
-    # Elo
-    if elo_probabilities[:home_win_probability] > elo_probabilities[:away_win_probability]
-      chosen_team = match.home_team.name
-      odds = 1 / elo_probabilities[:home_win_probability]
-      total_profit[:elo] += calculate_profit(match, :home, odds, 100)
-      successful_bets[:elo] += 1 if winning_team == chosen_team
-    else
-      chosen_team = match.away_team.name
-      odds = 1 / elo_probabilities[:away_win_probability]
-      total_profit[:elo] += calculate_profit(match, :away, odds, 100)
-      successful_bets[:elo] += 1 if winning_team == chosen_team
-    end
-    puts "W Elo stawiam na #{chosen_team} z kursem #{odds.round(2)}"
+    # Logika dla modelu Elo
+    total_profit[:elo] += process_bet(elo_probabilities, match, successful_bets, :elo)
 
-    # Kombinacja
-    if average_home_win_probability > average_away_win_probability
-      chosen_team = match.home_team.name
-      odds = 1 / average_home_win_probability
-      total_profit[:combined] += calculate_profit(match, :home, odds, 100)
-      successful_bets[:combined] += 1 if winning_team == chosen_team
-    else
-      chosen_team = match.away_team.name
-      odds = 1 / average_away_win_probability
-      total_profit[:combined] += calculate_profit(match, :away, odds, 100)
-      successful_bets[:combined] += 1 if winning_team == chosen_team
-    end
-    puts "W kombinacji stawiam na #{chosen_team} z kursem #{odds.round(2)}"
+    # Logika dla modelu Combined
+    combined_probabilities = {
+      home_win_probability: average_home_win_probability,
+      away_win_probability: average_away_win_probability
+    }
+    total_profit[:combined] += process_bet(combined_probabilities, match, successful_bets, :combined)
 
-    puts "W meczu #{match.home_team.name} - #{match.away_team.name} wygrała drużyna #{winning_team}."
+    puts "W meczu #{match.home_team.name} - #{match.away_team.name} wygrała drużyna #{determine_winner(match)}."
   end
 
-  puts "Wyniki symulacji:"
-  puts "Profit Poisson: #{total_profit[:poisson].round(2)} PLN"
-  puts "Profit Elo: #{total_profit[:elo].round(2)} PLN"
-  puts "Profit Combined: #{total_profit[:combined].round(2)} PLN"
+  display_results(total_profit, successful_bets, matches.count)
+end
 
-  # Wyświetlenie liczby trafnych obstawień
-  total_matches = matches.count
-  puts "Liczba meczów: #{total_matches}"
-  puts "Trafne obstawienia Poisson: #{successful_bets[:poisson]} na #{total_matches} (#{(successful_bets[:poisson].to_f / total_matches * 100).round(2)}%)"
-  puts "Trafne obstawienia Elo: #{successful_bets[:elo]} na #{total_matches} (#{(successful_bets[:elo].to_f / total_matches * 100).round(2)}%)"
-  puts "Trafne obstawienia Kombinacja: #{successful_bets[:combined]} na #{total_matches} (#{(successful_bets[:combined].to_f / total_matches * 100).round(2)}%)"
+def process_bet(probabilities, match, successful_bets, method)
+  if probabilities[:home_win_probability] > probabilities[:away_win_probability] && probabilities[:home_win_probability] > 0.55
+    chosen_team = match.home_team.name
+    odds = 1 / probabilities[:home_win_probability]
+    profit = calculate_profit(match, :home, odds, 100)
+    successful_bets[method] += 1 if determine_winner(match) == chosen_team
+    puts "W #{method.to_s.capitalize} stawiam na #{chosen_team} z kursem #{odds.round(2)}"
+    profit
+  elsif probabilities[:away_win_probability] > 0.55
+    chosen_team = match.away_team.name
+    odds = 1 / probabilities[:away_win_probability]
+    profit = calculate_profit(match, :away, odds, 100)
+    successful_bets[method] += 1 if determine_winner(match) == chosen_team
+    puts "W #{method.to_s.capitalize} stawiam na #{chosen_team} z kursem #{odds.round(2)}"
+    profit
+  else
+    puts "Pominięto zakład #{method.to_s.capitalize} w meczu o ID: #{match.id} - brak wyraźnego faworyta"
+    0
+  end
 end
 
 def calculate_profit(match, bet_on_team, odds, investment)
@@ -114,6 +96,18 @@ def determine_winner(match)
   else
     "Remis"
   end
+end
+
+def display_results(total_profit, successful_bets, total_matches)
+  puts "Wyniki symulacji:"
+  puts "Profit Poisson: #{total_profit[:poisson].round(2)} PLN"
+  puts "Profit Elo: #{total_profit[:elo].round(2)} PLN"
+  puts "Profit Combined: #{total_profit[:combined].round(2)} PLN"
+
+  puts "Liczba meczów: #{total_matches}"
+  puts "Trafne obstawienia Poisson: #{successful_bets[:poisson]} na #{total_matches} (#{(successful_bets[:poisson].to_f / total_matches * 100).round(2)}%)"
+  puts "Trafne obstawienia Elo: #{successful_bets[:elo]} na #{total_matches} (#{(successful_bets[:elo].to_f / total_matches * 100).round(2)}%)"
+  puts "Trafne obstawienia Kombinacja: #{successful_bets[:combined]} na #{total_matches} (#{(successful_bets[:combined].to_f / total_matches * 100).round(2)}%)"
 end
 
 simulate_betting

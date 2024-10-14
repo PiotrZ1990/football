@@ -42,9 +42,6 @@
 
   / Formularz do wybierania liczby meczów
   = form_with url: predict_odds_match_path(@match), method: :get, local: true do
-    .form-group
-      label for="num_matches" Number of last matches:
-      = number_field_tag :num_matches, params[:num_matches] || 32, min: 1, class: 'form-control'
 
     / Przycisk do przewidywania kursów
     = submit_tag 'Calculate Odds', class: 'btn btn-primary mt-2'
