@@ -13,7 +13,35 @@ class LeaguesController < ApplicationController
   # GET /leagues/1.json
   def show
     resize_logo if @league.logo.attached?
-    @teams = @league.teams.includes(:logo)
+    @teams = @league.teams
+
+    # Przygotowanie danych do histogramów
+    @home_win_buckets = Array.new(10, 0)
+    @away_win_buckets = Array.new(10, 0)
+
+    matches = Match.where(league_id: @league.id, round_number: 6..38)
+
+    matches.each do |match|
+      # Oblicz prawdopodobieństwo wygranej gospodarzy i gości
+      poisson_probabilities = Match.win_probabilities(match.home_team, match.away_team)
+      elo_probabilities = Match.elo_win_probabilities(match.home_team, match.away_team)
+
+      # Oblicz średnie prawdopodobieństwo
+      average_home_win_probability = (poisson_probabilities[:home_win_probability] + elo_probabilities[:home_win_probability]) / 2
+      average_away_win_probability = (poisson_probabilities[:away_win_probability] + elo_probabilities[:away_win_probability]) / 2
+
+      # Sprawdź, czy prawdopodobieństwo gospodarza jest powyżej 55%
+      if average_home_win_probability > 0.55
+        bucket_index = (average_home_win_probability * 100 / 10).to_i - 1
+        @home_win_buckets[bucket_index] += 1
+      end
+
+      # Sprawdź, czy prawdopodobieństwo gości jest powyżej 55%
+      if average_away_win_probability > 0.55
+        bucket_index = (average_away_win_probability * 100 / 10).to_i - 1
+        @away_win_buckets[bucket_index] += 1
+      end
+    end
   end
 
   # GET /leagues/new
@@ -122,7 +150,7 @@ class LeaguesController < ApplicationController
   private
 
   def set_league
-    @league = League.find(params[:id])
+    @league = League.includes(:teams).find(params[:id])
   end
 
   # Resize league logo using ChunkyPNG

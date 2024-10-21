@@ -25,9 +25,13 @@ div id=dom_id(@league) class="text-center"
 
   br
 
-  #league-map(style="height: 500px; width: 100%; display: none;" data-teams=@league.teams.to_json(only: [:lat, :lng, :name, :logo], methods: [:logo_url]))
+  h2 Home Team Wins Probability Histogram
+  = column_chart @home_win_buckets.each_with_index.map { |value, index| ["#{index * 10 + 1}-#{(index + 1) * 10}%", value] },
+                 library: { title: { text: 'Home Team Wins by Probability Bucket' }, yAxis: { title: { text: 'Number of Wins' } }, xAxis: { title: { text: 'Probability (%)' } } }
 
-  br
+  h2 Away Team Wins Probability Histogram
+  = column_chart @away_win_buckets.each_with_index.map { |value, index| ["#{index * 10 + 1}-#{(index + 1) * 10}%", value] },
+                 library: { title: { text: 'Away Team Wins by Probability Bucket' }, yAxis: { title: { text: 'Number of Wins' } }, xAxis: { title: { text: 'Probability (%)' } } }
 
   h2 Teams in this League
 
@@ -57,23 +61,18 @@ div id=dom_id(@league) class="text-center"
     p No teams in this league.
 
   / Modal for team comparison
-
   .modal.fade id="compareTeamsModal" tabindex="-1" role="dialog" aria-labelledby="compareTeamsModalLabel" aria-hidden="true"
     .modal-dialog(role="document")
       .modal-content
         .modal-header
-          h5.modal-title id="compareTeamsModalLabel" Compare Teams
-          button.close type="button" data-bs-dismiss="modal" aria-label="Close" class="ms-auto"
+          h5#compareTeamsModalLabel.modal-title Compare Teams
+          button.close(type="button" data-bs-dismiss="modal" aria-label="Close")
             span aria-hidden="true" &times;
-        = form_tag compare_teams_league_path(@league), method: :post do
-          .modal-body
-            .form-group
-              = hidden_field_tag :league_id, @league.id
-              - @league.teams.each do |team|
-                .form-check
-                  = check_box_tag 'team_ids[]', team.id, false, id: "team_#{team.id}"
-                  = label_tag "team_#{team.id}", team.name, class: 'form-check-label'
-          .modal-footer
-            = button_tag 'Close', type: 'button', class: 'btn btn-secondary', data: { bs_dismiss: 'modal' }
-            = submit_tag 'Compare', class: 'btn btn-primary'
+        .modal-body
+          p Select teams for comparison:
+          = form_with url: compare_teams_league_path(@league), method: :post, remote: true, id: 'compare-teams-form' do |f|
+            = f.select :team_ids, options_from_collection_for_select(@teams, :id, :name), {}, multiple: true, class: 'form-control'
+        .modal-footer
+          button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Close
+          button.btn.btn-primary(type="button" id="compare-teams-submit") Compare
 
