@@ -24,15 +24,19 @@ div id=dom_id(@league) class="text-center"
       i Compare Teams
 
   br
-
+  br
   h2 Home Team Wins Probability Histogram
-  = column_chart @home_win_buckets.each_with_index.map { |value, index| ["#{index * 10 + 1}-#{(index + 1) * 10}%", value] },
-                 library: { title: { text: 'Home Team Wins by Probability Bucket' }, yAxis: { title: { text: 'Number of Wins' } }, xAxis: { title: { text: 'Probability (%)' } } }
+  = column_chart @home_wins_buckets.map { |bucket, count| [bucket, count] },
+               library: { title: { text: 'Home Team Wins by Probability Bucket' }, 
+                          yAxis: { title: { text: 'Number of Wins' } }, 
+                          xAxis: { title: { text: 'Probability (%)' } } }
 
   h2 Away Team Wins Probability Histogram
-  = column_chart @away_win_buckets.each_with_index.map { |value, index| ["#{index * 10 + 1}-#{(index + 1) * 10}%", value] },
-                 library: { title: { text: 'Away Team Wins by Probability Bucket' }, yAxis: { title: { text: 'Number of Wins' } }, xAxis: { title: { text: 'Probability (%)' } } }
-
+  = column_chart @away_wins_buckets.map { |bucket, count| [bucket, count] },
+               library: { title: { text: 'Away Team Wins by Probability Bucket' }, 
+                          yAxis: { title: { text: 'Number of Wins' } }, 
+                          xAxis: { title: { text: 'Probability (%)' } } }
+  br
   h2 Teams in this League
 
   - if @league.teams.any?
@@ -75,4 +79,3 @@ div id=dom_id(@league) class="text-center"
         .modal-footer
           button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Close
           button.btn.btn-primary(type="button" id="compare-teams-submit") Compare
-

@@ -12,35 +12,163 @@ class LeaguesController < ApplicationController
   # GET /leagues/1
   # GET /leagues/1.json
   def show
-    resize_logo if @league.logo.attached?
+    @league = League.find(params[:id])
     @teams = @league.teams
 
-    # Przygotowanie danych do histogramów
-    @home_win_buckets = Array.new(10, 0)
-    @away_win_buckets = Array.new(10, 0)
-
-    matches = Match.where(league_id: @league.id, round_number: 6..38)
-
-    matches.each do |match|
-      # Oblicz prawdopodobieństwo wygranej gospodarzy i gości
-      poisson_probabilities = Match.win_probabilities(match.home_team, match.away_team)
-      elo_probabilities = Match.elo_win_probabilities(match.home_team, match.away_team)
-
-      # Oblicz średnie prawdopodobieństwo
-      average_home_win_probability = (poisson_probabilities[:home_win_probability] + elo_probabilities[:home_win_probability]) / 2
-      average_away_win_probability = (poisson_probabilities[:away_win_probability] + elo_probabilities[:away_win_probability]) / 2
-
-      # Sprawdź, czy prawdopodobieństwo gospodarza jest powyżej 55%
-      if average_home_win_probability > 0.55
-        bucket_index = (average_home_win_probability * 100 / 10).to_i - 1
-        @home_win_buckets[bucket_index] += 1
-      end
-
-      # Sprawdź, czy prawdopodobieństwo gości jest powyżej 55%
-      if average_away_win_probability > 0.55
-        bucket_index = (average_away_win_probability * 100 / 10).to_i - 1
-        @away_win_buckets[bucket_index] += 1
-      end
+    @home_wins_buckets = Hash.new(0)
+    @away_wins_buckets = Hash.new(0)
+    
+    case @league.id
+    when 1
+      @home_wins_buckets = {
+        "1-10%" => 0,
+        "11-20%" => 0,
+        "21-30%" => 33,
+        "31-40%" => 87,
+        "41-50%" => 91,
+        "51-60%" => 68,
+        "61-70%" => 47,
+        "71-80%" => 4,
+        "81-90%" => 0,
+        "91-100%" => 0
+      }
+      @away_wins_buckets = {
+        "1-10%" => 0,
+        "11-20%" => 0,
+        "21-30%" => 39,
+        "31-40%" => 76,
+        "41-50%" => 94,
+        "51-60%" => 75,
+        "61-70%" => 44,
+        "71-80%" => 2,
+        "81-90%" => 0,
+        "91-100%" => 0
+      }
+    when 2
+      @home_wins_buckets = {
+        "1-10%" => 0,
+        "11-20%" => 0,
+        "21-30%" => 11,
+        "31-40%" => 73,
+        "41-50%" => 145,
+        "51-60%" => 64,
+        "61-70%" => 14,
+        "71-80%" => 0,
+        "81-90%" => 0,
+        "91-100%" => 0
+      }
+      @away_wins_buckets = {
+        "1-10%" => 0,
+        "11-20%" => 0,
+        "21-30%" => 13,
+        "31-40%" => 73,
+        "41-50%" => 151,
+        "51-60%" => 59,
+        "61-70%" => 11,
+        "71-80%" => 0,
+        "81-90%" => 0,
+        "91-100%" => 0
+      }
+    when 3
+      @home_wins_buckets = {
+        "1-10%" => 0,
+        "11-20%" => 0,
+        "21-30%" => 22,
+        "31-40%" => 90,
+        "41-50%" => 127,
+        "51-60%" => 78,
+        "61-70%" => 13,
+        "71-80%" => 0,
+        "81-90%" => 0,
+        "91-100%" => 0
+      }
+      @away_wins_buckets = {
+        "1-10%" => 0,
+        "11-20%" => 0,
+        "21-30%" => 24,
+        "31-40%" => 92,
+        "41-50%" => 126,
+        "51-60%" => 74,
+        "61-70%" => 14,
+        "71-80%" => 0,
+        "81-90%" => 0,
+        "91-100%" => 0
+      }
+    when 4
+      @home_wins_buckets = {
+        "1-10%" => 0,
+        "11-20%" => 4,
+        "21-30%" => 18,
+        "31-40%" => 37,
+        "41-50%" => 45,
+        "51-60%" => 32,
+        "61-70%" => 17,
+        "71-80%" => 2,
+        "81-90%" => 0,
+        "91-100%" => 0
+      }
+      @away_wins_buckets = {
+        "1-10%" => 0,
+        "11-20%" => 2,
+        "21-30%" => 18,
+        "31-40%" => 37,
+        "41-50%" => 44,
+        "51-60%" => 34,
+        "61-70%" => 16,
+        "71-80%" => 4,
+        "81-90%" => 0,
+        "91-100%" => 0
+      }
+    when 5
+      @home_wins_buckets = {
+        "1-10%" => 0,
+        "11-20%" => 0,
+        "21-30%" => 14,
+        "31-40%" => 79,
+        "41-50%" => 91,
+        "51-60%" => 64,
+        "61-70%" => 13,
+        "71-80%" => 0,
+        "81-90%" => 0,
+        "91-100%" => 0
+      }
+      @away_wins_buckets = {
+        "1-10%" => 0,
+        "11-20%" => 0,
+        "21-30%" => 12,
+        "31-40%" => 81,
+        "41-50%" => 92,
+        "51-60%" => 62,
+        "61-70%" => 14,
+        "71-80%" => 0,
+        "81-90%" => 0,
+        "91-100%" => 0
+      }
+    when 6
+      @home_wins_buckets = {
+        "1-10%" => 0,
+        "11-20%" => 2,
+        "21-30%" => 24,
+        "31-40%" => 69,
+        "41-50%" => 68,
+        "51-60%" => 70,
+        "61-70%" => 23,
+        "71-80%" => 5,
+        "81-90%" => 0,
+        "91-100%" => 0
+      }
+      @away_wins_buckets = {
+        "1-10%" => 0,
+        "11-20%" => 2,
+        "21-30%" => 25,
+        "31-40%" => 65,
+        "41-50%" => 69,
+        "51-60%" => 72,
+        "61-70%" => 22,
+        "71-80%" => 6,
+        "81-90%" => 0,
+        "91-100%" => 0
+      }
     end
   end
 
@@ -116,25 +244,13 @@ class LeaguesController < ApplicationController
       # Zbierz wszystkie unikalne daty
       all_dates = @team_stats.flat_map { |stats| stats[:points_over_time].map { |point| point[0] } }.uniq.sort
 
-      # Uzupełnij brakujące punkty w danych każdej drużyny dla "Points Over Time"
+      # Uzupełnij brakujące punkty
       @team_stats.each do |stats|
         points_over_time_data = stats[:points_over_time].to_h
         complete_data = all_dates.map { |date| [date, points_over_time_data[date] || 0] }
         stats[:points_over_time] = complete_data
       end
 
-      # Uzupełnij brakujące punkty w danych każdej drużyny dla "Cumulative Points"
-      @team_stats.each do |stats|
-        cumulative_points_data = stats[:cumulative_points].to_h
-        cumulative_total = 0 # Zmienna śledząca sumę punktów
-        complete_cumulative_data = all_dates.map do |date|
-          cumulative_total += (cumulative_points_data[date] || 0)
-          [date, cumulative_total]
-        end
-        stats[:cumulative_points] = complete_cumulative_data
-      end
-
-      # Przygotowanie danych do wykresów
       @points_over_time = @team_stats.map { |stats| { name: stats[:team].name, data: stats[:points_over_time] } }
       @cumulative_points = @team_stats.map { |stats| { name: stats[:team].name, data: stats[:cumulative_points] } }
 
@@ -144,48 +260,12 @@ class LeaguesController < ApplicationController
     end
   end
 
-
-
-
   private
 
   def set_league
     @league = League.includes(:teams).find(params[:id])
   end
 
-  # Resize league logo using ChunkyPNG
-  def resize_logo
-    return unless @league.logo.attached?
-
-    begin
-      logo_path = ActiveStorage::Blob.service.path_for(@league.logo.key)
-
-      # Load image using ChunkyPNG
-      png = ChunkyPNG::Image.from_file(logo_path)
-
-      # Resize image to fit within 200x200 pixels
-      png_resized = png.resize(200, 200)
-
-      # Create a temporary PNG file
-      temp_png = Tempfile.new(['resized_logo', '.png'])
-      temp_png.binmode
-
-      # Save resized image to temporary file
-      png_resized.save(temp_png.path)
-
-      # Attach the resized image as @resized_logo
-      @resized_logo_path = temp_png.path
-
-    rescue StandardError => e
-      logger.error "Failed to resize logo: #{e.message}"
-      # Handle error or notify user
-    ensure
-      temp_png.close
-      temp_png.unlink if temp_png
-    end
-  end
-
-  # Only allow a list of trusted parameters through.
   def league_params
     params.require(:league).permit(:name, :country, :logo)
   end
